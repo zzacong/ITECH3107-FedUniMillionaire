@@ -6,7 +6,7 @@ public class Question {
 
     private String title;
     private int answer;
-    private ArrayList<String> choices;
+    private ArrayList<String> choices = new ArrayList<String>();
 
     public Question(String title) {
         this.title = title;
