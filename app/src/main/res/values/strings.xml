@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">FedUni Millionaire 30360914</string>
+    <string name="feduni_millionaire">FedUni Millionaire</string>
+    <string name="start">Start</string>
+    <string name="who_wants_to_be_a_millionaire">Who Wants to be a Millionaire?</string>
+    <string name="a">A.</string>
+    <string name="b">B.</string>
+    <string name="c">C.</string>
+    <string name="d">D.</string>
+    <string name="choice">choice</string>
+    <string name="submit">Submit</string>
+    <string name="semi_colon">:</string>
+    <string name="dollar_value">Dollar value</string>
+    <string name="placeholder">placeholder</string>
+    <string name="current_safe_money">Current safe money</string>
+    <string name="questions_left">Questions left</string>
+    <string name="question">Question:</string>
+    <string name="question_title">Question Title</string>
 </resources>
