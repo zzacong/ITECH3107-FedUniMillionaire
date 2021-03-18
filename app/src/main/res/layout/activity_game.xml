@@ -11,7 +11,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:paddingHorizontal="10dp"
         android:stretchColumns="2"
@@ -22,7 +22,7 @@
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="4dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -48,7 +48,7 @@
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="4dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -75,7 +75,7 @@
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="4dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -105,7 +105,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:text="@string/question"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
         app:layout_constraintBottom_toTopOf="@+id/cardView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tableLayout" />
@@ -117,7 +117,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginBottom="4dp"
         android:text="@string/placeholder"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
         app:layout_constraintBottom_toTopOf="@+id/cardView"
         app:layout_constraintStart_toEndOf="@+id/tvQuestionNumberLabel"
         app:layout_constraintTop_toBottomOf="@+id/tableLayout"
@@ -149,8 +149,8 @@
                 android:id="@+id/tvQuestionTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
                 android:text="@string/question_title"
                 android:textAlignment="center"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
@@ -208,7 +208,7 @@
                 </LinearLayout>
 
                 <RadioGroup
-                    android:id="@+id/btnGroupChoices"
+                    android:id="@+id/radGroup"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1">
@@ -217,24 +217,28 @@
                         android:id="@+id/radA"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:minHeight="38dp"
                         android:text="@string/choice" />
 
                     <RadioButton
                         android:id="@+id/radB"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:minHeight="38dp"
                         android:text="@string/choice" />
 
                     <RadioButton
                         android:id="@+id/radC"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:minHeight="38dp"
                         android:text="@string/choice" />
 
                     <RadioButton
                         android:id="@+id/radD"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:minHeight="38dp"
                         android:text="@string/choice" />
 
                 </RadioGroup>
@@ -250,7 +254,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
-        android:layout_marginBottom="60dp"
+        android:layout_marginBottom="40dp"
         android:text="@string/submit"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
