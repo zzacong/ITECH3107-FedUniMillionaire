@@ -6,8 +6,8 @@ import java.util.Map;
 
 public class QuestionBank {
 
-  private static QuestionBank instance = new QuestionBank();
-  private ArrayList<Question> questions;
+  private final static QuestionBank instance = new QuestionBank();
+  private final ArrayList<Question> questions;
 
   private QuestionBank() {
     Question q1 = new Question("A sousaphone is also known as what?");
@@ -55,17 +55,18 @@ public class QuestionBank {
     q11.setChoices("Deer", "Rabbit", "Elephant", "Donkey");
     q11.setAnswer(2);
 
-    questions.add(q1);
-    questions.add(q2);
-    questions.add(q3);
-    questions.add(q4);
-    questions.add(q5);
-    questions.add(q6);
-    questions.add(q7);
-    questions.add(q8);
-    questions.add(q9);
-    questions.add(q10);
-    questions.add(q11);
+    this.questions = new ArrayList<Question>();
+    this.questions.add(q1);
+    this.questions.add(q2);
+    this.questions.add(q3);
+    this.questions.add(q4);
+    this.questions.add(q5);
+    this.questions.add(q6);
+    this.questions.add(q7);
+    this.questions.add(q8);
+    this.questions.add(q9);
+    this.questions.add(q10);
+    this.questions.add(q11);
   }
 
   public static ArrayList<Question> getQuestions() {
