@@ -15,4 +15,8 @@
     <string name="questions_left">Questions left</string>
     <string name="question">Question:</string>
     <string name="question_title">Question Title</string>
+    <string name="lose_message">Wrong answer.</string>
+    <string name="win_message">Congratulations. You Win!</string>
+    <string name="main_menu">Main menu</string>
+    <string name="you_ve_won">You\'ve won</string>
 </resources>
