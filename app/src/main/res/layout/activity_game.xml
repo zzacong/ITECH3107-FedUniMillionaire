@@ -115,7 +115,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginBottom="6dp"
         android:text="@string/placeholder"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
         app:layout_constraintBottom_toTopOf="@+id/cardView"
@@ -218,28 +218,28 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:minHeight="38dp"
-                        android:text="@string/choice" />
+                        android:text="@string/placeholder" />
 
                     <RadioButton
                         android:id="@+id/radB"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:minHeight="38dp"
-                        android:text="@string/choice" />
+                        android:text="@string/placeholder" />
 
                     <RadioButton
                         android:id="@+id/radC"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:minHeight="38dp"
-                        android:text="@string/choice" />
+                        android:text="@string/placeholder" />
 
                     <RadioButton
                         android:id="@+id/radD"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:minHeight="38dp"
-                        android:text="@string/choice" />
+                        android:text="@string/placeholder" />
 
                 </RadioGroup>
 
