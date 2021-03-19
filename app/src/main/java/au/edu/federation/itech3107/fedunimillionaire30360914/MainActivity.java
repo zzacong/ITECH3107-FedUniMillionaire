@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void startGame(View view) {
-        Log.d(LOG_TAG, "[START] Start game");
+        Log.d(LOG_TAG, "[START QUIZ]");
         Intent intent = new Intent(this, GameActivity.class);
         startActivity(intent);
     }

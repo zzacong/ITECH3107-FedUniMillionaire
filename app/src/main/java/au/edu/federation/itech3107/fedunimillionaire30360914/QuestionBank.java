@@ -1,13 +1,33 @@
 package au.edu.federation.itech3107.fedunimillionaire30360914;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class QuestionBank {
 
-    private final static QuestionBank INSTANCE = new QuestionBank();
+    private static final QuestionBank INSTANCE = new QuestionBank();
     private final ArrayList<Question> questions;
+
+    private static final List<Integer> SAFE_MONEY_LIST = Arrays.asList(0, 1000, 32000, 1000000);
+
+    private static final Map<Integer, Integer> QUESTION_VALUE_LIST = new HashMap<Integer, Integer>() {
+        {
+            put(1, 1000);
+            put(2, 2000);
+            put(3, 4000);
+            put(4, 8000);
+            put(5, 16000);
+            put(6, 32000);
+            put(7, 64000);
+            put(8, 125000);
+            put(9, 250000);
+            put(10, 500000);
+            put(11, 1000000);
+        }
+    };
 
     private QuestionBank() {
         Question q1 = new Question("A sousaphone is also known as what?");
@@ -75,5 +95,13 @@ public class QuestionBank {
 
     public ArrayList<Question> getQuestions() {
         return this.questions;
+    }
+
+    public int getQuestionValue(int key) {
+        return QUESTION_VALUE_LIST.get(key);
+    }
+
+    public int getSafeMoneyValue(int index) {
+        return SAFE_MONEY_LIST.get(index);
     }
 }

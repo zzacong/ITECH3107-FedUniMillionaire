@@ -17,6 +17,13 @@ public class EndgameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_endgame);
         tvWinLose = findViewById(R.id.tvWinLose);
         tvDollar = findViewById(R.id.tvDollar);
+
+        Intent intent = getIntent();
+        boolean win = intent.getBooleanExtra(GameActivity.EXTRA_RESULT, true);
+        String dollar = intent.getStringExtra(GameActivity.EXTRA_DOLLAR);
+
+        tvWinLose.setText(win ? R.string.win_message : R.string.lose_message);
+        tvDollar.setText("$ " + dollar);
     }
 
     public void gotoMainMenu(View view) {
