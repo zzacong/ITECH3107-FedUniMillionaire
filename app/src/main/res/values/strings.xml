@@ -11,7 +11,7 @@
     <string name="semi_colon">:</string>
     <string name="dollar_value">Dollar value</string>
     <string name="placeholder">placeholder</string>
-    <string name="current_safe_money">Current safe money</string>
+    <string name="safe_money">Safe money</string>
     <string name="questions_left">Questions left</string>
     <string name="question">Question:</string>
     <string name="question_title">Question Title</string>

@@ -20,8 +20,10 @@ public class QuestionAdapter {
         return currentNumber;
     }
 
-    public void setCurrentNumber(Integer currentNumber) {
-        this.currentNumber = currentNumber;
+    public Question startFrom(int number) {
+        if (number <= 0) this.currentNumber = 0;
+        else this.currentNumber = number - 1;
+        return nextQuestion();
     }
 
     public Integer getQuestionsLeft() {

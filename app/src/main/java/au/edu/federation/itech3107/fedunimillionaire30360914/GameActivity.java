@@ -31,7 +31,7 @@ public class GameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
-
+        Log.d(LOG_TAG, "[ON_CREATE]");
         tvDollarValue = findViewById(R.id.tvDollarValue);
         tvSafeMoney = findViewById(R.id.tvSafeMoney);
         tvQuestionsLeft = findViewById(R.id.tvQuestionsLeft);
@@ -45,13 +45,8 @@ public class GameActivity extends AppCompatActivity {
         btnSubmit = findViewById(R.id.btnSubmit);
 
         questionAdapter = new QuestionAdapter();
+        this.question = questionAdapter.startFrom(0);
         nextQuestion();
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 
     public void handleSubmit(View view) {
@@ -61,6 +56,7 @@ public class GameActivity extends AppCompatActivity {
             int selectedIndex = radGroup.indexOfChild(findViewById(selectedRadId));
             if (question.attempt(selectedIndex)) {
                 Log.d(LOG_TAG, "[CORRECT]");
+                this.question = questionAdapter.nextQuestion();
                 nextQuestion();
             } else {
                 Log.d(LOG_TAG, "[WRONG] Current question: " + questionAdapter.getCurrentNumber());
@@ -71,9 +67,7 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    public void nextQuestion() {
-
-        question = questionAdapter.nextQuestion();
+    private void nextQuestion() {
         if (question != null) {
             radGroup.clearCheck();
             tvQuestionTitle.setText(question.getTitle());
@@ -94,7 +88,7 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    public void endGame(boolean result) {
+    private void endGame(boolean result) {
         Log.d(LOG_TAG, "[END QUIZ]");
         Intent intent = new Intent(this, EndgameActivity.class);
         intent.putExtra(EXTRA_RESULT, result);
@@ -117,7 +111,7 @@ public class GameActivity extends AppCompatActivity {
         super.onRestoreInstanceState(savedInstanceState);
         int number = savedInstanceState.getInt(OUTSTATE_QUESTION_NO);
         Log.d(LOG_TAG, "[RESTORING STATE] Current question: " + number);
-        questionAdapter.setCurrentNumber(number - 1);
+        this.question = questionAdapter.startFrom(number);
         nextQuestion();
     }
 
