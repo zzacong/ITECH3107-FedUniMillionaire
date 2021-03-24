@@ -22,10 +22,12 @@ public class EndgameActivity extends AppCompatActivity {
         boolean win = intent.getBooleanExtra(GameActivity.EXTRA_RESULT, true);
         String dollar = intent.getStringExtra(GameActivity.EXTRA_DOLLAR);
 
+        // Show end game message based on quiz result (win or lose?)
         tvWinLose.setText(win ? R.string.win_message : R.string.lose_message);
         tvDollar.setText("$ " + dollar);
     }
 
+    // Called when user press the MainMenu button, return to MainActivity
     public void gotoMainMenu(View view) {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);

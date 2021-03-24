@@ -32,6 +32,8 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         Log.d(LOG_TAG, "[ON_CREATE]");
+
+        // Link variables to screen components
         tvDollarValue = findViewById(R.id.tvDollarValue);
         tvSafeMoney = findViewById(R.id.tvSafeMoney);
         tvQuestionsLeft = findViewById(R.id.tvQuestionsLeft);
@@ -44,11 +46,13 @@ public class GameActivity extends AppCompatActivity {
         radD = findViewById(R.id.radD);
         btnSubmit = findViewById(R.id.btnSubmit);
 
+        // Instantiate a new QuestionAdapter to manage the quiz questions
         questionAdapter = new QuestionAdapter();
         this.question = questionAdapter.startFrom(0);
         nextQuestion();
     }
 
+    // Called when users press submit button
     public void handleSubmit(View view) {
         int selectedRadId = radGroup.getCheckedRadioButtonId();
         // Check if player has selected an answer
@@ -67,6 +71,7 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+    // Display current question dollar value, safe money amount and show the questions and choices
     private void nextQuestion() {
         if (question != null) {
             radGroup.clearCheck();
@@ -82,12 +87,14 @@ public class GameActivity extends AppCompatActivity {
             tvQuestionNumber.setText(currentNumber.toString());
             tvQuestionsLeft.setText(questionAdapter.getQuestionsLeft().toString());
         } else {
+            // If there's no more questions, disable the submit button and ends the game
             Log.d(LOG_TAG, "[DONE] No more questions");
             btnSubmit.setEnabled(false);
             endGame(true);
         }
     }
 
+    // Open the EndgameActivity with a boolean as the win/lose result
     private void endGame(boolean result) {
         Log.d(LOG_TAG, "[END QUIZ]");
         Intent intent = new Intent(this, EndgameActivity.class);

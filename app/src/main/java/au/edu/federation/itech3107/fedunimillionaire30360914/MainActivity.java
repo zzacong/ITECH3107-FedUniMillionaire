@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-
+    // Called when user press start button, open the GameActivity
     public void startGame(View view) {
         Log.d(LOG_TAG, "[START QUIZ]");
         Intent intent = new Intent(this, GameActivity.class);
