@@ -1,32 +1,29 @@
 package au.edu.federation.itech3107.fedunimillionaire30360914;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
 
 public class QuestionAdapter {
 
     private final int MAX = 11;
     private final ArrayList<Question> questionList;
-    private final Iterator<Question> questionIter;
-    private Question currQuestion;
-    private Integer questionNumber = 1;
-    private Integer questionsLeft = MAX - questionNumber;
+    private QuestionBank questionBank;
+    private Integer currentNumber = 0;
+    private Integer questionsLeft = MAX - currentNumber;
 
 
     public QuestionAdapter() {
-        this.questionList = QuestionBank.getInstance().getQuestions();
-        this.questionIter = questionList.iterator();
-        this.currQuestion = questionIter.next();
+        this.questionBank = QuestionBank.getInstance();
+        this.questionList = questionBank.getQuestions();
     }
 
-    public Question getCurrQuestion() {
-        return currQuestion;
+    public Integer getCurrentNumber() {
+        return currentNumber;
     }
 
-    public Integer getQuestionNumber() {
-        return questionNumber;
+    public Question startFrom(int number) {
+        if (number <= 0) this.currentNumber = 0;
+        else this.currentNumber = number - 1;
+        return nextQuestion();
     }
 
     public Integer getQuestionsLeft() {
@@ -34,13 +31,28 @@ public class QuestionAdapter {
     }
 
     public Question nextQuestion() {
-        if (questionIter.hasNext()) {
-            this.currQuestion = questionIter.next();
-            this.questionNumber++;
-            this.questionsLeft = MAX - this.questionNumber;
-            return currQuestion;
+        this.currentNumber++;
+        if (this.currentNumber <= questionList.size()) {
+            this.questionsLeft = MAX - this.currentNumber;
+            return questionList.get(this.currentNumber - 1);
         }
-        this.currQuestion = null;
         return null;
+    }
+
+    public Integer getSafeMoneyValue() {
+        int number = this.currentNumber - 1;
+        if (number >= 1 && number <= 5) {
+            return questionBank.getSafeMoneyValue(1);
+        } else if (number >= 6 && number <= 10) {
+            return questionBank.getSafeMoneyValue(2);
+        } else if (number >= 11) {
+            return questionBank.getSafeMoneyValue(3);
+        } else {
+            return 0;
+        }
+    }
+
+    public Integer getQuestionValue() {
+        return questionBank.getQuestionValue(this.currentNumber);
     }
 }

@@ -7,13 +7,16 @@
     <string name="b">B.</string>
     <string name="c">C.</string>
     <string name="d">D.</string>
-    <string name="choice">choice</string>
     <string name="submit">Submit</string>
     <string name="semi_colon">:</string>
     <string name="dollar_value">Dollar value</string>
     <string name="placeholder">placeholder</string>
-    <string name="current_safe_money">Current safe money</string>
+    <string name="safe_money">Safe money</string>
     <string name="questions_left">Questions left</string>
     <string name="question">Question:</string>
     <string name="question_title">Question Title</string>
+    <string name="lose_message">Wrong answer.</string>
+    <string name="win_message">Congratulations. You Win!</string>
+    <string name="main_menu">Main menu</string>
+    <string name="you_ve_won">You\'ve won</string>
 </resources>
