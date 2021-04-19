@@ -1,18 +1,26 @@
 package au.edu.federation.itech3107.fedunimillionaire30360914;
 
+import android.content.Context;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+
+import au.edu.federation.itech3107.fedunimillionaire30360914.Question.Difficulty;
 
 public class QuestionBank {
 
-    private static final QuestionBank INSTANCE = new QuestionBank();
-    private final ArrayList<Question> questions;
-
     private static final List<Integer> SAFE_MONEY_LIST = Arrays.asList(0, 1000, 32000, 1000000);
-
     private static final Map<Integer, Integer> QUESTION_VALUE_LIST = new HashMap<Integer, Integer>() {
         {
             put(1, 1000);
@@ -29,72 +37,22 @@ public class QuestionBank {
         }
     };
 
-    private QuestionBank() {
-        Question q1 = new Question("A sousaphone is also known as what?");
-        q1.setChoices("Tuba", "Trumpet", "Banjo", "Harmonica");
-        q1.setAnswer(0);
+    private static final String TAG = QuestionBank.class.getSimpleName();
+    private static final String EASY_QUESTIONS_FILENAME = "questions-easy.txt";
+    private static final String MEDIUM_QUESTIONS_FILENAME = "questions-medium.txt";
+    private static final String HARD_QUESTIONS_FILENAME = "questions-hard.txt";
 
-        Question q2 = new Question("Which of the following is not a Roman numeral?");
-        q2.setChoices("M", "L", "G", "D");
-        q2.setAnswer(2);
+    private Context context;
+    private ArrayList<Question> easyQuestions;
+    private ArrayList<Question> mediumQuestions;
+    private ArrayList<Question> hardQuestions;
 
-        Question q3 = new Question("If you celebrate something bi-annually, how often do you celebrate it?");
-        q3.setChoices("Every two months", "Every two years", "Every three months", "Every three years");
-        q3.setAnswer(1);
 
-        Question q4 = new Question(
-                "The four fundamental forces in physics are strong, electromagnetic, gravitational, and what?");
-        q4.setChoices("Weak", "Frictional", "Magnetic", "Normal");
-        q4.setAnswer(0);
-
-        Question q5 = new Question("Which of these African countries is located south of the equator?");
-        q5.setChoices("Chad", "Mali", "Angola", "Cameroon");
-        q5.setAnswer(2);
-
-        Question q6 = new Question("A popular expression goes \"A bird in the hand is worth two in the\" what?");
-        q6.setChoices("Tree", "Bush", "Window", "Pot");
-        q6.setAnswer(1);
-
-        Question q7 = new Question("Which insect inspired the term 'computer bug'?");
-        q7.setChoices("Cockroach", "Moth", "Fly", "Beetle");
-        q7.setAnswer(1);
-
-        Question q8 = new Question("Which part of a chicken is commonly called the 'drumstick'?");
-        q8.setChoices("Leg", "Wing", "Thigh", "Breast");
-        q8.setAnswer(0);
-
-        Question q9 = new Question("Which man does NOT have a chemical element named after him?");
-        q9.setChoices("Isaac Newton", "Enrico Fermi", "Albert Einstein", "Niels Bohr");
-        q9.setAnswer(0);
-
-        Question q10 = new Question("What is the Celsius equivalent of 77 degrees Fahrenheit?");
-        q10.setChoices("15", "20", "25", "30");
-        q10.setAnswer(2);
-
-        Question q11 = new Question("What sort of animal is Walt Disney's Dumbo?");
-        q11.setChoices("Deer", "Rabbit", "Elephant", "Donkey");
-        q11.setAnswer(2);
-
-        this.questions = new ArrayList<Question>();
-        this.questions.add(q1);
-        this.questions.add(q2);
-        this.questions.add(q3);
-        this.questions.add(q4);
-        this.questions.add(q5);
-        this.questions.add(q6);
-        this.questions.add(q7);
-        this.questions.add(q8);
-        this.questions.add(q9);
-        this.questions.add(q10);
-        this.questions.add(q11);
-    }
-
-    public static QuestionBank getInstance() {
-        return INSTANCE;
-    }
-
-    public ArrayList<Question> getQuestions() {
-        return this.questions;
+    public QuestionBank(Context context) {
+        this.context = context;
+        this.easyQuestions = getEasyQuestions();
+        this.mediumQuestions = getMediumQuestions();
+        this.hardQuestions = getHardQuestions();
     }
 
     public int getQuestionValue(int key) {
@@ -103,5 +61,73 @@ public class QuestionBank {
 
     public int getSafeMoneyValue(int index) {
         return SAFE_MONEY_LIST.get(index);
+    }
+
+    public ArrayList<Question> getQuestions() {
+        return null;
+    }
+
+    public ArrayList<Question> getEasyQuestions() {
+        return readQuestionsFromTextFile(EASY_QUESTIONS_FILENAME);
+    }
+
+    public ArrayList<Question> getMediumQuestions() {
+        return readQuestionsFromTextFile(MEDIUM_QUESTIONS_FILENAME);
+    }
+
+    public ArrayList<Question> getHardQuestions() {
+        return readQuestionsFromTextFile(HARD_QUESTIONS_FILENAME);
+    }
+
+    public ArrayList<Question> readQuestionsFromTextFile(String fileName) {
+
+        ArrayList<Question> questionList = new ArrayList<>();
+        String fullText = "";
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(context.getAssets().open(fileName)))) {
+            String line = null;
+            // Read each line and append it to the fullText
+            while ((line = bufferedReader.readLine()) != null) {
+                fullText += line;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            // Parse the fullText into a JSON object, then get the questions JSON array
+            JSONObject json = new JSONObject(fullText);
+            JSONArray questionsArr = json.getJSONArray("questions");
+            Question question;
+
+            // For every JSON object in the JSON array, create a Question object and add to questions ArrayList
+            for (int i = 0; i < questionsArr.length(); i++) {
+                question = new Question();
+                JSONObject questionObj = questionsArr.getJSONObject(i);
+
+                // Get a random int between 0-3, use this to reference the index of correct answer later
+                int answerIndex = new Random().nextInt(4);
+
+                // Convert the incorrect answers JSON array into ArrayList<String>
+                JSONArray incorrectAnswer = questionObj.getJSONArray("incorrect_answers");
+                ArrayList<String> choices = new ArrayList<>();
+                for (int j = 0; j < incorrectAnswer.length(); j++) {
+                    choices.add(incorrectAnswer.getString(j));
+                }
+
+                // Add the correct answer at a random position to the choices ArrayList
+                choices.add(answerIndex, questionObj.getString("correct_answer"));
+
+                // Populate the question properties, then add it to the questions ArrayList
+                question.setTitle(questionObj.getString("question"));
+                question.setChoices(choices);
+                question.setAnswer(answerIndex);
+                question.setDifficulty(Difficulty.valueOf(questionObj.getString("difficulty")));
+
+                questionList.add(question);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return questionList;
     }
 }

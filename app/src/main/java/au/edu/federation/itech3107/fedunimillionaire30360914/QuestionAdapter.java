@@ -11,9 +11,9 @@ public class QuestionAdapter {
     private Integer questionsLeft = MAX - currentNumber;
 
 
-    public QuestionAdapter() {
-        this.questionBank = QuestionBank.getInstance();
-        this.questionList = questionBank.getQuestions();
+    public QuestionAdapter(QuestionBank questionBank) {
+        this.questionBank = questionBank;
+        this.questionList = questionBank.getEasyQuestions();
     }
 
     public Integer getCurrentNumber() {

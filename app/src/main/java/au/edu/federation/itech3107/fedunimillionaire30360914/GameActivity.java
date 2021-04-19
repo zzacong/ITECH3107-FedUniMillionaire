@@ -47,7 +47,7 @@ public class GameActivity extends AppCompatActivity {
         btnSubmit = findViewById(R.id.btnSubmit);
 
         // Instantiate a new QuestionAdapter to manage the quiz questions
-        questionAdapter = new QuestionAdapter();
+        questionAdapter = new QuestionAdapter(new QuestionBank(this));
         this.question = questionAdapter.startFrom(0);
         nextQuestion();
     }
