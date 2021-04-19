@@ -19,7 +19,7 @@ public class GameActivity extends AppCompatActivity {
     public static final String EXTRA_DOLLAR = "au.edu.federation.itech3107.fedunimillionaire.extra.DOLLAR";
     public static final String OUTSTATE_QUESTION_NO = "au.edu.federation.itech3107.fedunimillionaire.outstate.question_no";
 
-    TextView tvDollarValue, tvSafeMoney, tvQuestionsLeft, tvQuestionNumber, tvQuestionTitle;
+    TextView tvDollarValue, tvSafeMoney, tvDifficulty, tvQuestionsLeft, tvQuestionNumber, tvQuestionTitle;
     RadioGroup radGroup;
     RadioButton radA, radB, radC, radD;
     Button btnSubmit;
@@ -36,6 +36,7 @@ public class GameActivity extends AppCompatActivity {
         // Link variables to screen components
         tvDollarValue = findViewById(R.id.tvDollarValue);
         tvSafeMoney = findViewById(R.id.tvSafeMoney);
+        tvDifficulty = findViewById(R.id.tvDfficulty);
         tvQuestionsLeft = findViewById(R.id.tvQuestionsLeft);
         tvQuestionNumber = findViewById(R.id.tvQuestionNumber);
         tvQuestionTitle = findViewById(R.id.tvQuestionTitle);
@@ -84,6 +85,7 @@ public class GameActivity extends AppCompatActivity {
             Integer currentNumber = questionAdapter.getCurrentNumber();
             tvDollarValue.setText(questionAdapter.getQuestionValue().toString());
             tvSafeMoney.setText(questionAdapter.getSafeMoneyValue().toString());
+            tvDifficulty.setText(question.getDifficulty().toString());
             tvQuestionNumber.setText(currentNumber.toString());
             tvQuestionsLeft.setText(questionAdapter.getQuestionsLeft().toString());
         } else {
