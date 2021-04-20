@@ -21,9 +21,15 @@ public class EndgameActivity extends AppCompatActivity {
         Intent intent = getIntent();
         boolean win = intent.getBooleanExtra(GameActivity.EXTRA_RESULT, true);
         String dollar = intent.getStringExtra(GameActivity.EXTRA_DOLLAR);
+        String message = intent.getStringExtra(GameActivity.EXTRA_MESSAGE);
 
-        // Show end game message based on quiz result (win or lose?)
-        tvWinLose.setText(win ? R.string.win_message : R.string.lose_message);
+        if (message != null) {
+            // If custom message is provided, then use it to display on EndGame screen
+            tvWinLose.setText(message);
+        } else {
+            // Else, show end game message based on quiz result (win or lose?)
+            tvWinLose.setText(win ? R.string.win_message : R.string.lose_message);
+        }
         tvDollar.setText("$ " + dollar);
     }
 

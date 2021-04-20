@@ -35,7 +35,7 @@ public class QuestionBank {
         }
     };
 
-    private static final String TAG = QuestionBank.class.getSimpleName();
+    private static final String LOG_TAG = QuestionBank.class.getSimpleName();
     private static final String EASY_QUESTIONS_FILENAME = "questions-easy.txt";
     private static final String MEDIUM_QUESTIONS_FILENAME = "questions-medium.txt";
     private static final String HARD_QUESTIONS_FILENAME = "questions-hard.txt";
