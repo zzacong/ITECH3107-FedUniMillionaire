@@ -15,7 +15,7 @@ public class ScoreSQLiteOpenHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     // Define the "score" table
-    public static final String TABLE_PEOPLE = "score";
+    public static final String TABLE_SCORE = "score";
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_MONEY = "money";
@@ -23,7 +23,7 @@ public class ScoreSQLiteOpenHelper extends SQLiteOpenHelper {
 
     // SQL for table creation
     private static final String DATABASE_CREATE = "CREATE TABLE "
-            + TABLE_PEOPLE + "("
+            + TABLE_SCORE + "("
             + COLUMN_ID + " integer PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_NAME + " text NOT NULL, "
             + COLUMN_MONEY + " integer NOT NULL, "
@@ -35,8 +35,6 @@ public class ScoreSQLiteOpenHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    // Our overridden onCreate() method will create the database
-    // using our DATABASE_CREATE SQLite statement.
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(DATABASE_CREATE);
@@ -46,7 +44,7 @@ public class ScoreSQLiteOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop the table before creating a new one
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PEOPLE);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SCORE);
 
         // Recreate the database
         onCreate(db);

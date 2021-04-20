@@ -19,7 +19,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    // Called when user press start button, open the GameActivity
+    // Called when user press play button, open the GameActivity
+    // in normal / hot seat mode
     public void startGame(View view) {
         Log.d(LOG_TAG, "[START QUIZ]");
         Intent intent = new Intent(this, GameActivity.class);
@@ -30,4 +31,10 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    // Called when user press view scores button, open the ScoreActivity
+    public void viewScores(View view) {
+        Log.d(LOG_TAG, "[VIEW SCORES]");
+        Intent intent = new Intent(this, ScoresActivity.class);
+        startActivity(intent);
+    }
 }

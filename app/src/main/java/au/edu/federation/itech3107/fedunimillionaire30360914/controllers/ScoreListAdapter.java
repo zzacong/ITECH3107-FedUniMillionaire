@@ -9,7 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import au.edu.federation.itech3107.fedunimillionaire30360914.R;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Score;
@@ -18,7 +18,7 @@ public class ScoreListAdapter extends RecyclerView.Adapter<ScoreListAdapter.View
 
     public static final String LOG_TAG = ScoreListAdapter.class.getSimpleName();
 
-    private ArrayList<Score> localDataSet;
+    private List<Score> localDataSet;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -32,24 +32,29 @@ public class ScoreListAdapter extends RecyclerView.Adapter<ScoreListAdapter.View
         }
     }
 
-    public ScoreListAdapter(ArrayList<Score> localDataSet) {
+    public ScoreListAdapter(List<Score> localDataSet) {
+        Log.d(LOG_TAG, "[ADAPTER]");
         this.localDataSet = localDataSet;
+        Log.d(LOG_TAG, this.localDataSet.size() + "");
     }
 
     @NonNull
     @Override
     public ScoreListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Log.d(LOG_TAG, "[ON CREATE VIEW HOLDER]");
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.score_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ScoreListAdapter.ViewHolder holder, int position) {
+        Log.d(LOG_TAG, "[ON BIND VIEW HOLDER]");
         Score score = localDataSet.get(position);
         Log.d(LOG_TAG, score.toString());
 
         holder.tvName.setText(score.getName());
-        holder.tvMoney.setText(score.getMoney());
+        String money = "$" + score.getMoney();
+        holder.tvMoney.setText(money);
         holder.tvDatetime.setText(score.getDatetime());
     }
 

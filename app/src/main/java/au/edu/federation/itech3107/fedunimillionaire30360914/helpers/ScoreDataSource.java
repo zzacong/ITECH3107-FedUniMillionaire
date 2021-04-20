@@ -14,7 +14,7 @@ import au.edu.federation.itech3107.fedunimillionaire30360914.models.Score;
 
 public class ScoreDataSource {
 
-    private final static String TAG = ScoreDataSource.class.getSimpleName();
+    private final static String LOG_TAG = ScoreDataSource.class.getSimpleName();
 
     private SQLiteDatabase database;
     private ScoreSQLiteOpenHelper dbHelper;
@@ -44,7 +44,7 @@ public class ScoreDataSource {
             database = dbHelper.getWritableDatabase();
         } catch (SQLException sqle) {
             // Couldn't open the database? Log an error.
-            Log.e(TAG, "[DATABASE] Could not open database: " + sqle.getMessage());
+            Log.e(LOG_TAG, "[DATABASE] Could not open database: " + sqle.getMessage());
         }
     }
 
@@ -65,9 +65,9 @@ public class ScoreDataSource {
         values.put(ScoreSQLiteOpenHelper.COLUMN_DATETIME, datetime);
 
         // insert it into the database
-        long insertId = database.insert(ScoreSQLiteOpenHelper.TABLE_PEOPLE, null, values);
+        long insertId = database.insert(ScoreSQLiteOpenHelper.TABLE_SCORE, null, values);
 
-        Log.d(TAG, "Inserted person " + insertId + " into the database!");
+        Log.d(LOG_TAG, "[DATABASE] Inserted score " + insertId + " into the database");
     }
 
 
@@ -75,14 +75,15 @@ public class ScoreDataSource {
     public void delete(Score sc) {
         // Extract the id from the person object
         Long id = sc.getId();
-        database.delete(ScoreSQLiteOpenHelper.TABLE_PEOPLE, ScoreSQLiteOpenHelper.COLUMN_ID + " = ?", new String[]{id.toString()});
-        Log.d(TAG, "[SCORE] Deleted record with id: " + id);
+        database.delete(ScoreSQLiteOpenHelper.TABLE_SCORE, ScoreSQLiteOpenHelper.COLUMN_ID + " = ?", new String[]{id.toString()});
+        Log.d(LOG_TAG, "[SCORE] Deleted record with id: " + id);
     }
 
 
     // Method to delete all rows from the score table
     public void deleteAllScores() {
-        database.delete(ScoreSQLiteOpenHelper.TABLE_PEOPLE, null, null);
+        database.delete(ScoreSQLiteOpenHelper.TABLE_SCORE, null, null);
+        database.execSQL("UPDATE `sqlite_sequence` SET `seq` = 0 WHERE `name` = '" + ScoreSQLiteOpenHelper.TABLE_SCORE + "';");
     }
 
 
@@ -101,20 +102,21 @@ public class ScoreDataSource {
     }
 
 
-    // Method to return a list of people
-    public List<Score> retrieveAllPeople() {
+    // Method to return a list of score
+    public List<Score> retrieveAllScores() {
         // Create a new ArrayList of People objects
-        List<Score> scoreList = new ArrayList<Score>();
+        List<Score> scoreList = new ArrayList<>();
 
         // Query the database for all columns
-        Cursor cursor = database.query(ScoreSQLiteOpenHelper.TABLE_PEOPLE, allColumns, null, null, null, null, null);
+        Cursor cursor = database.query(ScoreSQLiteOpenHelper.TABLE_SCORE, allColumns, null, null, null, null, null);
 
-        // Move to the very first record (i.e. 'row') in our result set...
+        // Move to the first row
         cursor.moveToFirst();
 
         // extract every row as a Score object and add to score ArrayList
         while (!cursor.isAfterLast()) {
             Score score = cursorToScore(cursor);
+//            Log.d(LOG_TAG, score.toString());
             scoreList.add(score);
             cursor.moveToNext();
         }
