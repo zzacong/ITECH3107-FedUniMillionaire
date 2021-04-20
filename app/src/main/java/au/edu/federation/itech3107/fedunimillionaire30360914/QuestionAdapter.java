@@ -2,6 +2,8 @@ package au.edu.federation.itech3107.fedunimillionaire30360914;
 
 import java.util.ArrayList;
 
+import static au.edu.federation.itech3107.fedunimillionaire30360914.QuestionBank.QUESTION_VALUE_SAFE_MONEY_LIST;
+
 public class QuestionAdapter {
 
     private final int MAX = 11;
@@ -11,8 +13,8 @@ public class QuestionAdapter {
     private Integer questionsLeft = MAX - currentNumber;
 
 
-    public QuestionAdapter() {
-        this.questionBank = QuestionBank.getInstance();
+    public QuestionAdapter(QuestionBank questionBank) {
+        this.questionBank = questionBank;
         this.questionList = questionBank.getQuestions();
     }
 
@@ -41,18 +43,10 @@ public class QuestionAdapter {
 
     public Integer getSafeMoneyValue() {
         int number = this.currentNumber - 1;
-        if (number >= 1 && number <= 5) {
-            return questionBank.getSafeMoneyValue(1);
-        } else if (number >= 6 && number <= 10) {
-            return questionBank.getSafeMoneyValue(2);
-        } else if (number >= 11) {
-            return questionBank.getSafeMoneyValue(3);
-        } else {
-            return 0;
-        }
+        return QUESTION_VALUE_SAFE_MONEY_LIST.get(number)[1];
     }
 
     public Integer getQuestionValue() {
-        return questionBank.getQuestionValue(this.currentNumber);
+        return QUESTION_VALUE_SAFE_MONEY_LIST.get(currentNumber)[0];
     }
 }

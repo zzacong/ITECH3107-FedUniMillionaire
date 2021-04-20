@@ -19,4 +19,5 @@
     <string name="win_message">Congratulations. You Win!</string>
     <string name="main_menu">Main menu</string>
     <string name="you_ve_won">You\'ve won</string>
+    <string name="difficulty">Difficulty</string>
 </resources>

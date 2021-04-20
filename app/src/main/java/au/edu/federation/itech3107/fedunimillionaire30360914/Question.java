@@ -4,26 +4,23 @@ import java.util.ArrayList;
 
 public class Question {
 
+    public enum Difficulty {
+        easy, medium, hard;
+    }
+
     private String title;
     private int answer;
-    private ArrayList<String> choices = new ArrayList<String>();
+    private Difficulty difficulty;
+    private ArrayList<String> choices = new ArrayList<>();
 
-    public Question(String title) {
-        this.title = title;
-    }
-
-    public Question(String title, ArrayList<String> choices, int answer) {
-        this(title);
-        this.choices = choices;
-        this.answer = answer;
-    }
+    public Question() {}
 
     public String getTitle() {
         return title;
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        this.title = capitalise(title);
     }
 
     public int getAnswer() {
@@ -39,14 +36,37 @@ public class Question {
     }
 
     public void setChoices(String a, String b, String c, String d) {
-        this.choices.add(a);
-        this.choices.add(b);
-        this.choices.add(c);
-        this.choices.add(d);
+        this.choices.clear();
+        this.choices.add(capitalise(a));
+        this.choices.add(capitalise(b));
+        this.choices.add(capitalise(c));
+        this.choices.add(capitalise(d));
+    }
+
+    public void setChoices(ArrayList<String> choices) {
+        this.choices.clear();
+        for (String str : choices) {
+            this.choices.add(capitalise(str));
+        }
+    }
+
+    public Difficulty getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(Difficulty difficulty) {
+        this.difficulty = difficulty;
     }
 
     public boolean attempt(int choice) {
         return choice == answer;
+    }
+
+    private String capitalise(String text) {
+        if (text != null && !text.isEmpty()) {
+            return text.substring(0, 1).toUpperCase() + text.substring(1);
+        }
+        return text;
     }
 
 }
