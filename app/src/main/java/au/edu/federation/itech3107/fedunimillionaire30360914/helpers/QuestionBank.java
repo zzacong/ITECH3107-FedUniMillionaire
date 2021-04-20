@@ -1,4 +1,4 @@
-package au.edu.federation.itech3107.fedunimillionaire30360914;
+package au.edu.federation.itech3107.fedunimillionaire30360914.helpers;
 
 import android.content.Context;
 
@@ -14,7 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import au.edu.federation.itech3107.fedunimillionaire30360914.Question.Difficulty;
+import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
+import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Difficulty;
 
 public class QuestionBank {
 

@@ -1,4 +1,4 @@
-package au.edu.federation.itech3107.fedunimillionaire30360914;
+package au.edu.federation.itech3107.fedunimillionaire30360914.helpers;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

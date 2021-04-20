@@ -1,4 +1,4 @@
-package au.edu.federation.itech3107.fedunimillionaire30360914;
+package au.edu.federation.itech3107.fedunimillionaire30360914.controllers;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +10,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+
+import au.edu.federation.itech3107.fedunimillionaire30360914.R;
+import au.edu.federation.itech3107.fedunimillionaire30360914.models.Score;
 
 public class ScoreListAdapter extends RecyclerView.Adapter<ScoreListAdapter.ViewHolder> {
 

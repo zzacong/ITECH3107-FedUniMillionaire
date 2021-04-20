@@ -1,6 +1,5 @@
 package au.edu.federation.itech3107.fedunimillionaire30360914;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,6 +12,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import au.edu.federation.itech3107.fedunimillionaire30360914.controllers.QuestionAdapter;
+import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank;
+import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
 
 import static au.edu.federation.itech3107.fedunimillionaire30360914.MainActivity.EXTRA_HOT_MODE;
 
