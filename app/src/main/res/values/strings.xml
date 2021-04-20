@@ -23,4 +23,9 @@
     <string name="times_up">Time\'s Up!</string>
     <string name="play_hot_seat_mode">Play Hot Seat Mode</string>
     <string name="play_normal_mode">Play Normal Mode</string>
+    <string name="view_scores">View Scores</string>
+    <string name="final_scores">Final Scores</string>
+    <string name="name">Name</string>
+    <string name="money_won">Money won</string>
+    <string name="date_time">Date/time</string>
 </resources>
