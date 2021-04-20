@@ -23,13 +23,11 @@ public class MainActivity extends AppCompatActivity {
     public void startGame(View view) {
         Log.d(LOG_TAG, "[START QUIZ]");
         Intent intent = new Intent(this, GameActivity.class);
+        if (view.getId() == R.id.btnStartHotMode) {
+            Log.d(LOG_TAG, "[START QUIZ] HOT SEAT MODE");
+            intent.putExtra(EXTRA_HOT_MODE, true);
+        }
         startActivity(intent);
     }
 
-    public void startGameInHotMode(View view) {
-        Log.d(LOG_TAG, "[START QUIZ] HOT SEAT MODE");
-        Intent intent = new Intent(this, GameActivity.class);
-        intent.putExtra(EXTRA_HOT_MODE, true);
-        startActivity(intent);
-    }
 }

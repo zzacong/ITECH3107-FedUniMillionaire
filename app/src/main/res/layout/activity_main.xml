@@ -49,7 +49,7 @@
         android:layout_marginStart="50dp"
         android:layout_marginEnd="50dp"
         android:layout_marginBottom="80dp"
-        android:onClick="startGameInHotMode"
+        android:onClick="startGame"
         android:text="@string/play_hot_seat_mode"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
