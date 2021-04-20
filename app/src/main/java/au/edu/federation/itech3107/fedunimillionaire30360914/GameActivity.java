@@ -1,10 +1,9 @@
 package au.edu.federation.itech3107.fedunimillionaire30360914;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -12,20 +11,33 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import static au.edu.federation.itech3107.fedunimillionaire30360914.MainActivity.EXTRA_HOT_MODE;
+
+
 public class GameActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = GameActivity.class.getSimpleName();
     public static final String EXTRA_RESULT = "au.edu.federation.itech3107.fedunimillionaire.extra.RESULT";
+    public static final String EXTRA_MESSAGE = "au.edu.federation.itech3107.fedunimillionaire.extra.MESSAGE";
     public static final String EXTRA_DOLLAR = "au.edu.federation.itech3107.fedunimillionaire.extra.DOLLAR";
     public static final String OUTSTATE_QUESTION_NO = "au.edu.federation.itech3107.fedunimillionaire.outstate.question_no";
 
-    TextView tvDollarValue, tvSafeMoney, tvDifficulty, tvQuestionsLeft, tvQuestionNumber, tvQuestionTitle;
+    private final long HOT_MODE_TIME = 5000L;
+    private final long ONE_SECOND = 1000L;
+
+    TextView tvDollarValue, tvSafeMoney, tvDifficulty, tvQuestionsLeft, tvQuestionNumber, tvQuestionTitle, tvTimer;
     RadioGroup radGroup;
     RadioButton radA, radB, radC, radD;
     Button btnSubmit;
 
     QuestionAdapter questionAdapter;
     Question question;
+
+    Handler handler;
+    boolean isHotMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,12 +52,20 @@ public class GameActivity extends AppCompatActivity {
         tvQuestionsLeft = findViewById(R.id.tvQuestionsLeft);
         tvQuestionNumber = findViewById(R.id.tvQuestionNumber);
         tvQuestionTitle = findViewById(R.id.tvQuestionTitle);
+        tvTimer = findViewById(R.id.tvTimer);
         radGroup = findViewById(R.id.radGroup);
         radA = findViewById(R.id.radA);
         radB = findViewById(R.id.radB);
         radC = findViewById(R.id.radC);
         radD = findViewById(R.id.radD);
         btnSubmit = findViewById(R.id.btnSubmit);
+
+        // Determine whether to start Hot Seat Mode
+        Intent intent = getIntent();
+        isHotMode = intent.getBooleanExtra(EXTRA_HOT_MODE, false);
+        if (isHotMode) {
+            handler = new Handler();
+        }
 
         // Instantiate a new QuestionAdapter to manage the quiz questions
         questionAdapter = new QuestionAdapter(new QuestionBank(this));
@@ -58,6 +78,9 @@ public class GameActivity extends AppCompatActivity {
         int selectedRadId = radGroup.getCheckedRadioButtonId();
         // Check if player has selected an answer
         if (selectedRadId != -1) {
+            // Cancel hot seat timer
+            if (isHotMode)
+                cancelHotCounting();
             int selectedIndex = radGroup.indexOfChild(findViewById(selectedRadId));
             if (question.attempt(selectedIndex)) {
                 Log.d(LOG_TAG, "[CORRECT]");
@@ -88,6 +111,13 @@ public class GameActivity extends AppCompatActivity {
             tvDifficulty.setText(question.getDifficulty().toString());
             tvQuestionNumber.setText(currentNumber.toString());
             tvQuestionsLeft.setText(questionAdapter.getQuestionsLeft().toString());
+
+            // Reset hot seat timer
+            if (isHotMode) {
+                startHotCounting();
+                Integer sec = (int) HOT_MODE_TIME / 1000;
+                tvTimer.setText(sec.toString());
+            }
         } else {
             // If there's no more questions, disable the submit button and ends the game
             Log.d(LOG_TAG, "[DONE] No more questions");
@@ -98,9 +128,15 @@ public class GameActivity extends AppCompatActivity {
 
     // Open the EndgameActivity with a boolean as the win/lose result
     private void endGame(boolean result) {
+        endGame(result, null);
+    }
+
+    private void endGame(boolean result, String message) {
         Log.d(LOG_TAG, "[END QUIZ]");
         Intent intent = new Intent(this, EndgameActivity.class);
         intent.putExtra(EXTRA_RESULT, result);
+        if (message != null)
+            intent.putExtra(EXTRA_MESSAGE, message);
         intent.putExtra(EXTRA_DOLLAR, questionAdapter.getSafeMoneyValue().toString());
         startActivity(intent);
         finish();
@@ -123,5 +159,48 @@ public class GameActivity extends AppCompatActivity {
         this.question = questionAdapter.startFrom(number);
         nextQuestion();
     }
+
+    public void startHotCounting() {
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                // Post a job to handler to end game after time's up
+                handler.postDelayed(hotTask, HOT_MODE_TIME);
+
+                int sec = (int) HOT_MODE_TIME / 1000;
+                while (sec >= 0) {
+                    try {
+                        Thread.sleep(ONE_SECOND);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    sec--;
+                    Integer finalSec = sec;
+
+                    // Show the seconds left till time's up
+                    tvTimer.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            tvTimer.setText(finalSec.toString());
+                        }
+                    });
+                }
+            }
+        };
+        thread.start();
+    }
+
+    public void cancelHotCounting() {
+        handler.removeCallbacks(hotTask);
+        Log.d(LOG_TAG, "[HOT MODE] Cancelled");
+    }
+
+    private Runnable hotTask = new Runnable() {
+        @Override
+        public void run() {
+            Log.d(LOG_TAG, "[HOT MODE] Time's Up");
+            endGame(false, "Time's Up!");
+        }
+    };
 
 }

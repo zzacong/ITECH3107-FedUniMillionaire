@@ -10,6 +10,8 @@ import android.view.View;
 public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    public static final String EXTRA_HOT_MODE = "au.edu.federation.itech3107.fedunimillionaire.extra.HOT_MODE";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,6 +23,13 @@ public class MainActivity extends AppCompatActivity {
     public void startGame(View view) {
         Log.d(LOG_TAG, "[START QUIZ]");
         Intent intent = new Intent(this, GameActivity.class);
+        startActivity(intent);
+    }
+
+    public void startGameInHotMode(View view) {
+        Log.d(LOG_TAG, "[START QUIZ] HOT SEAT MODE");
+        Intent intent = new Intent(this, GameActivity.class);
+        intent.putExtra(EXTRA_HOT_MODE, true);
         startActivity(intent);
     }
 }
