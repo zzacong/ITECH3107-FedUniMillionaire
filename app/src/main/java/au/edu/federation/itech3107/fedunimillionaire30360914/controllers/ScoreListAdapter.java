@@ -38,6 +38,11 @@ public class ScoreListAdapter extends RecyclerView.Adapter<ScoreListAdapter.View
         Log.d(LOG_TAG, this.localDataSet.size() + "");
     }
 
+    public void refresh(List<Score> dataSet) {
+        this.localDataSet = dataSet;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public ScoreListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

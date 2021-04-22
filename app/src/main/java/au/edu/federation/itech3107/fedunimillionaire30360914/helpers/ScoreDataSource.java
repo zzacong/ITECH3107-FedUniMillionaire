@@ -14,7 +14,10 @@ import au.edu.federation.itech3107.fedunimillionaire30360914.models.Score;
 
 public class ScoreDataSource {
 
-    private final static String LOG_TAG = ScoreDataSource.class.getSimpleName();
+    public static final String ASC = " ASC";
+    public static final String DESC = " DESC";
+
+    private static final String LOG_TAG = ScoreDataSource.class.getSimpleName();
 
     private SQLiteDatabase database;
     private ScoreSQLiteOpenHelper dbHelper;
@@ -27,7 +30,6 @@ public class ScoreDataSource {
             ScoreSQLiteOpenHelper.COLUMN_MONEY,
             ScoreSQLiteOpenHelper.COLUMN_DATETIME
     };
-
 
     public ScoreDataSource(Context context) {
         // When we create a PersonDataSource, instantiate our dbHelper to
@@ -101,14 +103,24 @@ public class ScoreDataSource {
         return sc;
     }
 
-
-    // Method to return a list of score
     public List<Score> retrieveAllScores() {
+        return retrieveAllScores(null, null);
+    }
+
+    // Method to return a list of score with OrderBy function
+    public List<Score> retrieveAllScores(String column, String order) {
         // Create a new ArrayList of People objects
         List<Score> scoreList = new ArrayList<>();
 
+        // Form the orderBy clause
+        String orderBy = null;
+        if (column != null && order != null && !column.isEmpty() && !order.isEmpty()) {
+            orderBy = column + " " + order;
+            Log.d(LOG_TAG, "[ORDER BY] : " + orderBy);
+        }
+
         // Query the database for all columns
-        Cursor cursor = database.query(ScoreSQLiteOpenHelper.TABLE_SCORE, allColumns, null, null, null, null, null);
+        Cursor cursor = database.query(ScoreSQLiteOpenHelper.TABLE_SCORE, allColumns, null, null, null, null, orderBy);
 
         // Move to the first row
         cursor.moveToFirst();
@@ -116,7 +128,6 @@ public class ScoreDataSource {
         // extract every row as a Score object and add to score ArrayList
         while (!cursor.isAfterLast()) {
             Score score = cursorToScore(cursor);
-//            Log.d(LOG_TAG, score.toString());
             scoreList.add(score);
             cursor.moveToNext();
         }
