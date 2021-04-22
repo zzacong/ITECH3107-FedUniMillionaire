@@ -28,4 +28,6 @@
     <string name="name">Name</string>
     <string name="money_won">Money won</string>
     <string name="date_time">Date/time</string>
+    <string name="your_name">Your name</string>
+    <string name="error_player_name">Please enter your name</string>
 </resources>

@@ -13,27 +13,38 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import au.edu.federation.itech3107.fedunimillionaire30360914.controllers.QuestionAdapter;
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank;
+import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.ScoreDataSource;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
+import au.edu.federation.itech3107.fedunimillionaire30360914.models.Score;
 
 import static au.edu.federation.itech3107.fedunimillionaire30360914.MainActivity.EXTRA_HOT_MODE;
+import static au.edu.federation.itech3107.fedunimillionaire30360914.MainActivity.EXTRA_PLAYER_NAME;
 
 
 public class GameActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = GameActivity.class.getSimpleName();
     public static final String EXTRA_RESULT = "au.edu.federation.itech3107.fedunimillionaire.extra.RESULT";
     public static final String EXTRA_MESSAGE = "au.edu.federation.itech3107.fedunimillionaire.extra.MESSAGE";
     public static final String EXTRA_DOLLAR = "au.edu.federation.itech3107.fedunimillionaire.extra.DOLLAR";
     public static final String OUTSTATE_QUESTION_NO = "au.edu.federation.itech3107.fedunimillionaire.outstate.question_no";
+    public static final String DATETIME_FORMAT = "dd/MM/yyyy HH:mm";
+
     private static final String LOG_TAG = GameActivity.class.getSimpleName();
 
     private final long HOT_MODE_TIME = 5000L;
     private final long ONE_SECOND = 1000L;
+    private final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat(DATETIME_FORMAT);
+
 
     private TextView tvDollarValue, tvSafeMoney, tvDifficulty, tvQuestionsLeft, tvQuestionNumber, tvQuestionTitle, tvTimer;
     private RadioGroup radGroup;
@@ -47,9 +58,8 @@ public class GameActivity extends AppCompatActivity {
     private Timer timer;
 
     private boolean isHotMode;
+    private String playerName;
 
-    Handler handler;
-    boolean isHotMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,10 +82,10 @@ public class GameActivity extends AppCompatActivity {
         radD = findViewById(R.id.radD);
         btnSubmit = findViewById(R.id.btnSubmit);
 
-        // Determine whether to start Hot Seat Mode
         // Get intent extra passed from MainActivity
         Intent intent = getIntent();
         isHotMode = intent.getBooleanExtra(EXTRA_HOT_MODE, false);
+        playerName = intent.getStringExtra(EXTRA_PLAYER_NAME);
 
         // Determine whether to start Hot Seat Mode
         if (isHotMode) {
@@ -95,7 +105,6 @@ public class GameActivity extends AppCompatActivity {
         // Check if player has selected an answer
         if (selectedRadId != -1) {
             // Cancel hot seat timer
-            if (isHotMode)
             if (isHotMode) {
                 cancelHotCounting();
             }
@@ -154,6 +163,9 @@ public class GameActivity extends AppCompatActivity {
 
     private void endGame(boolean result, String message) {
         Log.d(LOG_TAG, "[END QUIZ]");
+
+        insertScoreListing();
+
         Intent intent = new Intent(this, EndgameActivity.class);
         // Pass the result (win/lose)
         intent.putExtra(EXTRA_RESULT, result);
@@ -163,7 +175,6 @@ public class GameActivity extends AppCompatActivity {
         if (message != null)
             // Pass any optional message to replace the default endgame-message
             intent.putExtra(EXTRA_MESSAGE, message);
-        intent.putExtra(EXTRA_DOLLAR, questionAdapter.getSafeMoneyValue().toString());
 
         startActivity(intent);
         finish();
@@ -193,6 +204,17 @@ public class GameActivity extends AppCompatActivity {
         super.onStop();
         if (isHotMode)
             cancelHotCounting();
+    }
+
+    public void insertScoreListing() {
+        Date now = Calendar.getInstance().getTime();
+        String formattedDate = dateTimeFormatter.format(now);
+
+        ScoreDataSource dataSource = new ScoreDataSource(this);
+        dataSource.open();
+        // Add player's score to database
+        dataSource.insert(playerName, questionAdapter.getSafeMoneyValue(), formattedDate);
+        dataSource.close();
     }
 
     public void startHotCounting() {
