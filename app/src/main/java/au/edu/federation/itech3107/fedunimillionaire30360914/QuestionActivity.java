@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import au.edu.federation.itech3107.fedunimillionaire30360914.controllers.QuestionListAdapter;
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank;
+import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Difficulty;
 
 public class QuestionActivity extends AppCompatActivity {
@@ -22,6 +23,9 @@ public class QuestionActivity extends AppCompatActivity {
     private RecyclerView rvQuestionList;
     private TextView tvQuestionFormError;
     private Button btnNewQuestion;
+
+    QuestionBank questionBank;
+    QuestionListAdapter questionListAdapter;
 
     private boolean showForm = false;
 
@@ -36,7 +40,8 @@ public class QuestionActivity extends AppCompatActivity {
         rvQuestionList = findViewById(R.id.rvQuestionList);
         btnNewQuestion = findViewById(R.id.btnNewQuestion);
 
-        QuestionListAdapter questionListAdapter = new QuestionListAdapter(new QuestionBank(this).getEasyQuestions());
+        questionBank = new QuestionBank(this);
+        questionListAdapter = new QuestionListAdapter(questionBank.getEasyQuestions());
 
         rvQuestionList.setLayoutManager(new LinearLayoutManager(this));
         rvQuestionList.setAdapter(questionListAdapter);
@@ -54,12 +59,15 @@ public class QuestionActivity extends AppCompatActivity {
         switch (view.getId()) {
             case R.id.btnShowEasy:
                 difficulty = Difficulty.easy;
+                questionListAdapter.refresh(questionBank.getEasyQuestions());
                 break;
             case R.id.btnShowMedium:
                 difficulty = Difficulty.medium;
+                questionListAdapter.refresh(questionBank.getMediumQuestions());
                 break;
             case R.id.btnShowHard:
                 difficulty = Difficulty.hard;
+                questionListAdapter.refresh(questionBank.getHardQuestions());
                 break;
         }
         Log.d(LOG_TAG, "[SHOW QUESTIONS] " + difficulty);
