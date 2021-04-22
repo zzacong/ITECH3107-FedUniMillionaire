@@ -44,7 +44,6 @@ public class ScoresActivity extends AppCompatActivity {
         arrowUpward = getDrawable(R.drawable.arrow_upward);
         arrowDownward = getDrawable(R.drawable.arrow_downward);
 
-//        insertDefaultRecords();
         scoreList = getAllRecordsFromDatabase(ScoreSQLiteOpenHelper.COLUMN_DATETIME, ScoreDataSource.ASC);
         Log.d(LOG_TAG, "" + scoreList.size());
 
@@ -91,28 +90,6 @@ public class ScoresActivity extends AppCompatActivity {
         List<Score> scoreList = dataSource.retrieveAllScores(column, order);
         dataSource.close();
         return scoreList;
-    }
-
-    // Method to clear the database and insert a few placeholder records
-    private void insertDefaultRecords() {
-        ScoreDataSource dataSource = new ScoreDataSource(this);
-        dataSource.open();
-
-        // Clear the table, then add some default records
-        dataSource.deleteAllScores();
-        scoreList.clear();
-
-        // Add a few scores to the list
-        scoreList.add(new Score("Ali", 1000, "02/04/2021 10:00"));
-        scoreList.add(new Score("Bob", 32000, "02/04/2021 10:05"));
-        scoreList.add(new Score("Carol", 1000, "04/04/2021 15:24"));
-
-        // Now add all the people in the list to the database
-        for (Score sc : scoreList) {
-            dataSource.insert(sc.getName(), sc.getMoney(), sc.getDatetime());
-        }
-
-        dataSource.close();
     }
 
     public void deleteScores(View view) {
