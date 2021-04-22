@@ -35,7 +35,7 @@ public class ScoreListAdapter extends RecyclerView.Adapter<ScoreListAdapter.View
             tvName = itemView.findViewById(R.id.tvName);
             tvMoney = itemView.findViewById(R.id.tvMoney);
             tvDatetime = itemView.findViewById(R.id.tvDatetime);
-            cbDelete = itemView.findViewById(R.id.cbDelete);
+            cbDelete = itemView.findViewById(R.id.cbDeleteScore);
         }
     }
 
