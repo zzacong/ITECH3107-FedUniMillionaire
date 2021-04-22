@@ -10,10 +10,12 @@ public class Question {
         easy, medium, hard;
     }
 
-    private String title;
-    private int answer;
     private Difficulty difficulty;
     private ArrayList<String> choices = new ArrayList<>();
+
+    private String title;
+    private int answer;
+    public boolean isChecked;
 
     public Question() {}
 

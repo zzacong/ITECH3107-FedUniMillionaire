@@ -1,20 +1,27 @@
 package au.edu.federation.itech3107.fedunimillionaire30360914;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
+import au.edu.federation.itech3107.fedunimillionaire30360914.controllers.QuestionListAdapter;
+import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Difficulty;
 
 public class QuestionActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = QuestionActivity.class.getSimpleName();
 
-    private View clNewQuestionForm;
+    private View clNewQuestionForm, clQuestionList;
+    private RecyclerView rvQuestionList;
     private TextView tvQuestionFormError;
+    private Button btnNewQuestion;
 
     private boolean showForm = false;
 
@@ -24,12 +31,22 @@ public class QuestionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_question);
 
         clNewQuestionForm = findViewById(R.id.clNewQuestionForm);
+        clQuestionList = findViewById(R.id.clQuestionList);
         tvQuestionFormError = findViewById(R.id.tvQuestionFormError);
+        rvQuestionList = findViewById(R.id.rvQuestionList);
+        btnNewQuestion = findViewById(R.id.btnNewQuestion);
+
+        QuestionListAdapter questionListAdapter = new QuestionListAdapter(new QuestionBank(this).getEasyQuestions());
+
+        rvQuestionList.setLayoutManager(new LinearLayoutManager(this));
+        rvQuestionList.setAdapter(questionListAdapter);
     }
 
     public void showForm(View view) {
         showForm = !showForm;
+        btnNewQuestion.setText(showForm ? R.string.hide : R.string.new_);
         clNewQuestionForm.setVisibility(showForm ? View.VISIBLE : View.GONE);
+        clQuestionList.setVisibility(showForm ? View.GONE : View.VISIBLE);
     }
 
     public void showQuestions(View view) {

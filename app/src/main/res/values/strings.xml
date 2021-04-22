@@ -14,12 +14,12 @@
     <string name="safe_money">Safe money</string>
     <string name="questions_left">Questions left</string>
     <string name="question">Question:</string>
-    <string name="question_title">Question Title</string>
+    <string name="question_title">Question Title:</string>
     <string name="lose_message">Wrong answer.</string>
     <string name="win_message">Congratulations. You Win!</string>
     <string name="main_menu">Main menu</string>
     <string name="you_ve_won">You\'ve won</string>
-    <string name="difficulty">Difficulty</string>
+    <string name="difficulty">Difficulty:</string>
     <string name="times_up">Time\'s Up!</string>
     <string name="play_hot_seat_mode">Play Hot Seat Mode</string>
     <string name="play_normal_mode">Play Normal Mode</string>
@@ -33,15 +33,17 @@
     <string name="delete">Delete</string>
     <string name="edit_questions">Edit questions</string>
     <string name="questions">Questions</string>
-    <string name="new_2">New</string>
+    <string name="new_">New</string>
     <string name="question_title_2">question title</string>
-    <string name="correct_answer">Correct answer</string>
+    <string name="correct_answer">Correct answer:</string>
     <string name="correct_answer_2">correct answer</string>
-    <string name="wrong_answers">Wrong answers</string>
+    <string name="wrong_answers">Wrong answers:</string>
     <string name="wrong_answer_2">wrong answer</string>
     <string name="hard">Hard</string>
     <string name="medium">Medium</string>
     <string name="easy">Easy</string>
+    <string name="hide">Hide</string>
+    <string name="add">Add</string>
 
     <string-array name="difficulty_array">
         <item>Easy</item>
