@@ -41,7 +41,7 @@ public class GameActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = GameActivity.class.getSimpleName();
 
-    private final long HOT_MODE_TIME = 5000L;
+    private final long HOT_MODE_TIME = 15000L;
     private final long ONE_SECOND = 1000L;
     private final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat(DATETIME_FORMAT);
 
