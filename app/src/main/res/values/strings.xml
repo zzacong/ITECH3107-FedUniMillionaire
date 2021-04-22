@@ -32,4 +32,20 @@
     <string name="error_player_name">Please enter your name</string>
     <string name="delete">Delete</string>
     <string name="edit_questions">Edit questions</string>
+    <string name="questions">Questions</string>
+    <string name="new_2">New</string>
+    <string name="question_title_2">question title</string>
+    <string name="correct_answer">Correct answer</string>
+    <string name="correct_answer_2">correct answer</string>
+    <string name="wrong_answers">Wrong answers</string>
+    <string name="wrong_answer_2">wrong answer</string>
+    <string name="hard">Hard</string>
+    <string name="medium">Medium</string>
+    <string name="easy">Easy</string>
+
+    <string-array name="difficulty_array">
+        <item>Easy</item>
+        <item>Medium</item>
+        <item>Hard</item>
+    </string-array>
 </resources>
