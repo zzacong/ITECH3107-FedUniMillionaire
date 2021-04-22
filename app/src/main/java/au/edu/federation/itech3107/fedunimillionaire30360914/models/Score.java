@@ -6,6 +6,7 @@ public class Score {
     private String name;
     private int money;
     private String datetime;
+    public boolean isChecked = false;
 
     public Score(String name, int money, String datetime) {
         this.name = name;

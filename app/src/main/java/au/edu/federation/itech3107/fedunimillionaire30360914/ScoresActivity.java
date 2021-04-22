@@ -114,4 +114,8 @@ public class ScoresActivity extends AppCompatActivity {
 
         dataSource.close();
     }
+
+    public void deleteScores(View view) {
+        scoreListAdapter.deleteScores();
+    }
 }
