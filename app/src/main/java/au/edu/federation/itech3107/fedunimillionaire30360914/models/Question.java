@@ -1,6 +1,8 @@
-package au.edu.federation.itech3107.fedunimillionaire30360914;
+package au.edu.federation.itech3107.fedunimillionaire30360914.models;
 
 import java.util.ArrayList;
+
+import static au.edu.federation.itech3107.fedunimillionaire30360914.utils.MyString.capitalise;
 
 public class Question {
 
@@ -62,11 +64,6 @@ public class Question {
         return choice == answer;
     }
 
-    private String capitalise(String text) {
-        if (text != null && !text.isEmpty()) {
-            return text.substring(0, 1).toUpperCase() + text.substring(1);
-        }
-        return text;
-    }
+
 
 }

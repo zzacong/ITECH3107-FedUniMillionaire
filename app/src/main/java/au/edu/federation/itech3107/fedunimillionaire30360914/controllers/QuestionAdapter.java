@@ -1,8 +1,11 @@
-package au.edu.federation.itech3107.fedunimillionaire30360914;
+package au.edu.federation.itech3107.fedunimillionaire30360914.controllers;
 
 import java.util.ArrayList;
 
-import static au.edu.federation.itech3107.fedunimillionaire30360914.QuestionBank.QUESTION_VALUE_SAFE_MONEY_LIST;
+import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank;
+import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
+
+import static au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank.QUESTION_VALUE_SAFE_MONEY_LIST;
 
 public class QuestionAdapter {
 

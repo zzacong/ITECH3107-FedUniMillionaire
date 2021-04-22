@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 public class EndgameActivity extends AppCompatActivity {
 
-    TextView tvWinLose, tvDollar;
+    private TextView tvWinLose, tvDollar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
