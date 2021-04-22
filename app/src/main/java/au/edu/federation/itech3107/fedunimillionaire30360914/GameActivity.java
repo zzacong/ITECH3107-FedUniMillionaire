@@ -13,6 +13,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import au.edu.federation.itech3107.fedunimillionaire30360914.controllers.QuestionAdapter;
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
@@ -27,17 +30,23 @@ public class GameActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "au.edu.federation.itech3107.fedunimillionaire.extra.MESSAGE";
     public static final String EXTRA_DOLLAR = "au.edu.federation.itech3107.fedunimillionaire.extra.DOLLAR";
     public static final String OUTSTATE_QUESTION_NO = "au.edu.federation.itech3107.fedunimillionaire.outstate.question_no";
+    private static final String LOG_TAG = GameActivity.class.getSimpleName();
 
     private final long HOT_MODE_TIME = 5000L;
     private final long ONE_SECOND = 1000L;
 
-    TextView tvDollarValue, tvSafeMoney, tvDifficulty, tvQuestionsLeft, tvQuestionNumber, tvQuestionTitle, tvTimer;
-    RadioGroup radGroup;
-    RadioButton radA, radB, radC, radD;
-    Button btnSubmit;
+    private TextView tvDollarValue, tvSafeMoney, tvDifficulty, tvQuestionsLeft, tvQuestionNumber, tvQuestionTitle, tvTimer;
+    private RadioGroup radGroup;
+    private RadioButton radA, radB, radC, radD;
+    private Button btnSubmit;
 
-    QuestionAdapter questionAdapter;
-    Question question;
+    private QuestionAdapter questionAdapter;
+    private Question question;
+
+    private Handler handler;
+    private Timer timer;
+
+    private boolean isHotMode;
 
     Handler handler;
     boolean isHotMode;
@@ -64,9 +73,13 @@ public class GameActivity extends AppCompatActivity {
         btnSubmit = findViewById(R.id.btnSubmit);
 
         // Determine whether to start Hot Seat Mode
+        // Get intent extra passed from MainActivity
         Intent intent = getIntent();
         isHotMode = intent.getBooleanExtra(EXTRA_HOT_MODE, false);
+
+        // Determine whether to start Hot Seat Mode
         if (isHotMode) {
+            // Instantiate a handler to handle hot seat count down task
             handler = new Handler();
         }
 
@@ -83,8 +96,13 @@ public class GameActivity extends AppCompatActivity {
         if (selectedRadId != -1) {
             // Cancel hot seat timer
             if (isHotMode)
+            if (isHotMode) {
                 cancelHotCounting();
+            }
+
             int selectedIndex = radGroup.indexOfChild(findViewById(selectedRadId));
+
+            // Check player has selected the correct answer;
             if (question.attempt(selectedIndex)) {
                 Log.d(LOG_TAG, "[CORRECT]");
                 this.question = questionAdapter.nextQuestion();
@@ -137,10 +155,16 @@ public class GameActivity extends AppCompatActivity {
     private void endGame(boolean result, String message) {
         Log.d(LOG_TAG, "[END QUIZ]");
         Intent intent = new Intent(this, EndgameActivity.class);
+        // Pass the result (win/lose)
         intent.putExtra(EXTRA_RESULT, result);
+        // Pass the amount of money 'win'
+        intent.putExtra(EXTRA_DOLLAR, questionAdapter.getSafeMoneyValue().toString());
+
         if (message != null)
+            // Pass any optional message to replace the default endgame-message
             intent.putExtra(EXTRA_MESSAGE, message);
         intent.putExtra(EXTRA_DOLLAR, questionAdapter.getSafeMoneyValue().toString());
+
         startActivity(intent);
         finish();
     }
@@ -163,37 +187,26 @@ public class GameActivity extends AppCompatActivity {
         nextQuestion();
     }
 
+    @Override
+    protected void onStop() {
+        Log.d(LOG_TAG, "[ON_STOP]");
+        super.onStop();
+        if (isHotMode)
+            cancelHotCounting();
+    }
+
     public void startHotCounting() {
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                // Post a job to handler to end game after time's up
-                handler.postDelayed(hotTask, HOT_MODE_TIME);
+        timer = new Timer();
+        int initialSec = (int) HOT_MODE_TIME / 1000;
 
-                int sec = (int) HOT_MODE_TIME / 1000;
-                while (sec >= 0) {
-                    try {
-                        Thread.sleep(ONE_SECOND);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    sec--;
-                    Integer finalSec = sec;
+        timer.scheduleAtFixedRate(new DisplaySecondsTask(initialSec), 0, ONE_SECOND);
+        // Post a job to handler to end the game after time's up
+        handler.postDelayed(hotTask, HOT_MODE_TIME);
 
-                    // Show the seconds left till time's up
-                    tvTimer.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            tvTimer.setText(finalSec.toString());
-                        }
-                    });
-                }
-            }
-        };
-        thread.start();
     }
 
     public void cancelHotCounting() {
+        timer.cancel();
         handler.removeCallbacks(hotTask);
         Log.d(LOG_TAG, "[HOT MODE] Cancelled");
     }
@@ -205,5 +218,25 @@ public class GameActivity extends AppCompatActivity {
             endGame(false, "Time's Up!");
         }
     };
+
+    private class DisplaySecondsTask extends TimerTask {
+        int seconds;
+
+        DisplaySecondsTask(int initialSec) {
+            this.seconds = initialSec;
+        }
+
+        @Override
+        public void run() {
+            Integer secToDisplay = seconds--;
+            // Show the seconds left to answer
+            tvTimer.post(new Runnable() {
+                @Override
+                public void run() {
+                    tvTimer.setText(secToDisplay.toString());
+                }
+            });
+        }
+    }
 
 }
