@@ -60,6 +60,13 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    // Called when user press edit question button, open the QuestionActivity
+    public void editQuestions(View view) {
+        Log.d(LOG_TAG, "[EDIT QUESTIONS]");
+        Intent intent = new Intent(this, QuestionActivity.class);
+        startActivity(intent);
+    }
+
     private boolean validPlayerName() {
         String name = etPlayerName.getText().toString();
         boolean isValid = true;
