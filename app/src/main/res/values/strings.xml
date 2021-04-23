@@ -46,8 +46,8 @@
     <string name="add">Add</string>
 
     <string-array name="difficulty_array">
-        <item>Easy</item>
-        <item>Medium</item>
-        <item>Hard</item>
+        <item>easy</item>
+        <item>medium</item>
+        <item>hard</item>
     </string-array>
 </resources>
