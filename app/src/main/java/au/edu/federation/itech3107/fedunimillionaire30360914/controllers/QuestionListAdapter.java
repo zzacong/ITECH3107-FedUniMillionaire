@@ -54,18 +54,6 @@ public class QuestionListAdapter extends RecyclerView.Adapter<QuestionListAdapte
         notifyItemInserted(localDataSet.size() - 1);
     }
 
-    public void deleteItems() {
-        List<Question> questionToDelete = new ArrayList<>();
-        for (Question q : localDataSet) {
-            if (q.isChecked) {
-                questionToDelete.add(q);
-                // TODO: Delete from file
-            }
-        }
-        localDataSet.removeAll(questionToDelete);
-        notifyDataSetChanged();
-    }
-
     public void refresh(List<Question> dataSet) {
         this.localDataSet = dataSet;
         notifyDataSetChanged();
