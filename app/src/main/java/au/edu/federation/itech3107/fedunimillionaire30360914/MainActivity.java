@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private boolean validPlayerName() {
+    public boolean validPlayerName() {
         String name = etPlayerName.getText().toString();
         boolean isValid = true;
 
