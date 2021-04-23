@@ -1,6 +1,7 @@
 package au.edu.federation.itech3107.fedunimillionaire30360914.controllers;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
@@ -10,13 +11,13 @@ import static au.edu.federation.itech3107.fedunimillionaire30360914.helpers.Ques
 public class QuizHandler {
 
     private final int MAX = 11;
-    private final ArrayList<Question> questionList;
+    private final List<Question> questionList;
     private Integer currentNumber = 0;
     private Integer questionsLeft = MAX - currentNumber;
 
 
     public QuizHandler(QuestionBank questionBank) {
-        this.questionList = questionBank.getQuestions();
+        this.questionList = questionBank.getQuizQuestions();
     }
 
     public Integer getCurrentNumber() {

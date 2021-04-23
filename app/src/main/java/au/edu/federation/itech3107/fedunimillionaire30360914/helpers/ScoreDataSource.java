@@ -125,7 +125,7 @@ public class ScoreDataSource {
         // Move to the first row
         cursor.moveToFirst();
 
-        // extract every row as a Score object and add to score ArrayList
+        // extract every row as a Score object and add to score List
         while (!cursor.isAfterLast()) {
             Score score = cursorToScore(cursor);
             scoreList.add(score);

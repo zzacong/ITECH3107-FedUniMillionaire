@@ -1,23 +1,33 @@
 package au.edu.federation.itech3107.fedunimillionaire30360914.models;
 
+import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.List;
 
 import static au.edu.federation.itech3107.fedunimillionaire30360914.utils.MyString.capitalise;
 
 public class Question {
+
+    private static final String LOG_TAG = Question.class.getSimpleName();
 
     public enum Difficulty {
         easy, medium, hard;
     }
 
     private Difficulty difficulty;
-    private ArrayList<String> choices = new ArrayList<>();
+    private List<String> choices = new ArrayList<>();
 
     private String title;
     private int answer;
     public boolean isChecked;
 
-    public Question() {}
+    public Question() {
+    }
 
     public String getTitle() {
         return title;
@@ -35,7 +45,7 @@ public class Question {
         this.answer = answer;
     }
 
-    public ArrayList<String> getChoices() {
+    public List<String> getChoices() {
         return choices;
     }
 
@@ -47,7 +57,7 @@ public class Question {
         this.choices.add(capitalise(d));
     }
 
-    public void setChoices(ArrayList<String> choices) {
+    public void setChoices(List<String> choices) {
         this.choices.clear();
         for (String str : choices) {
             this.choices.add(capitalise(str));
