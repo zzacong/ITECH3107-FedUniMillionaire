@@ -65,10 +65,10 @@ public class ScoreListAdapter extends RecyclerView.Adapter<ScoreListAdapter.View
         String money = "$" + score.getMoney();
         holder.tvMoney.setText(money);
         holder.tvDatetime.setText(score.getDatetime());
-        holder.cbDelete.setChecked(score.isChecked);
+        holder.cbDelete.setChecked(score.isChecked());
 
         holder.cbDelete.setOnCheckedChangeListener((cb, isChecked) -> {
-            score.isChecked = isChecked;
+            score.setChecked(isChecked);
         });
     }
 

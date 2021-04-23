@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -95,15 +96,22 @@ public class ScoresActivity extends AppCompatActivity {
 
         // For every score, check if it is checked for delete
         for (Score sc : scoreList) {
-            if (sc.isChecked) {
+            if (sc.isChecked()) {
                 scoresToDelete.add(sc);
                 // Delete the score record from database if checked
                 deleteFromDatabase(sc);
             }
         }
-        // Remove all selected scores
-        scoreList.removeAll(scoresToDelete);
-        scoreListAdapter.notifyDataSetChanged();
+        if (!scoresToDelete.isEmpty()) {
+            // There are scores to delete
+            // Remove all selected scores
+            scoreList.removeAll(scoresToDelete);
+            scoreListAdapter.notifyDataSetChanged();
+            Toast.makeText(this, "Scores successfully deleted!", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "No scores selected", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     public void deleteFromDatabase(Score score) {

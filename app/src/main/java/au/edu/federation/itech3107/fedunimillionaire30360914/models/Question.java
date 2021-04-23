@@ -24,7 +24,7 @@ public class Question {
 
     private String title;
     private int answer;
-    public boolean isChecked;
+    private boolean isChecked;
 
     public Question() {
     }
@@ -70,6 +70,14 @@ public class Question {
 
     public void setDifficulty(Difficulty difficulty) {
         this.difficulty = difficulty;
+    }
+
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(boolean isChecked) {
+        this.isChecked = isChecked;
     }
 
     public boolean attempt(int choice) {

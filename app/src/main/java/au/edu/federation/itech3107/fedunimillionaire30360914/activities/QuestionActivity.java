@@ -36,7 +36,7 @@ public class QuestionActivity extends AppCompatActivity {
     private TextView tvQuestionFormError;
     private EditText etQuestionTitle, etCorrectAnswer, etWrongAnswer1, etWrongAnswer2, etWrongAnswer3;
     private Spinner spDifficulty;
-    private Button btnNewQuestion;
+    private Button btnNewQuestion, btnShowEasy, btnShowMedium, btnShowHard;
 
     QuestionBank questionBank;
     QuestionListAdapter questionListAdapter;
@@ -59,6 +59,9 @@ public class QuestionActivity extends AppCompatActivity {
         etWrongAnswer2 = findViewById(R.id.etWrongAnswer2);
         etWrongAnswer3 = findViewById(R.id.etWrongAnswer3);
         btnNewQuestion = findViewById(R.id.btnNewQuestion);
+        btnShowEasy = findViewById(R.id.btnShowEasy);
+        btnShowMedium = findViewById(R.id.btnShowMedium);
+        btnShowHard = findViewById(R.id.btnShowHard);
         spDifficulty = findViewById(R.id.spDifficulty);
 
         questionBank = new QuestionBank(this);
@@ -80,6 +83,11 @@ public class QuestionActivity extends AppCompatActivity {
     }
 
     public void showQuestions(View view) {
+        btnShowEasy.setEnabled(true);
+        btnShowMedium.setEnabled(true);
+        btnShowHard.setEnabled(true);
+
+        view.setEnabled(false);
         switch (view.getId()) {
             case R.id.btnShowEasy:
                 difficulty = Difficulty.easy;
@@ -157,19 +165,25 @@ public class QuestionActivity extends AppCompatActivity {
 
         // For every question, check if the checkbox is selected
         for (Question q : questionList) {
-            if (q.isChecked) {
+            if (q.isChecked()) {
                 questionToDelete.add(q);
             }
         }
-        // Remove all selected questions
-        questionList.removeAll(questionToDelete);
+        if (!questionToDelete.isEmpty()) {
+            // There are questions to delete
+            // Remove all selected questions
+            questionList.removeAll(questionToDelete);
 
-        // Override the filtered question list back its file
-        if (questionBank.writeQuestions(questionList, difficulty)) {
-            questionListAdapter.notifyDataSetChanged();
-            Toast.makeText(this, "Questions successfully deleted!", Toast.LENGTH_SHORT).show();
+            // Override the filtered question list back its file
+            if (questionBank.writeQuestions(questionList, difficulty)) {
+                questionListAdapter.notifyDataSetChanged();
+                Toast.makeText(this, "Questions successfully deleted!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Questions delete failed.", Toast.LENGTH_SHORT).show();
+            }
         } else {
-            Toast.makeText(this, "Questions delete failed.", Toast.LENGTH_SHORT).show();
+            // No questions to delete
+            Toast.makeText(this, "No questions selected.", Toast.LENGTH_SHORT).show();
         }
     }
 }

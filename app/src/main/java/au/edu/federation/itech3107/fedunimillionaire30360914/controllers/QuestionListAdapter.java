@@ -95,9 +95,9 @@ public class QuestionListAdapter extends RecyclerView.Adapter<QuestionListAdapte
             j++;
         }
 
-        holder.cbDelete.setChecked(question.isChecked);
+        holder.cbDelete.setChecked(question.isChecked());
         holder.cbDelete.setOnCheckedChangeListener((cb, isChecked) -> {
-            question.isChecked = isChecked;
+            question.setChecked(isChecked);
         });
     }
 
