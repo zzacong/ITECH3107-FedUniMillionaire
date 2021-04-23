@@ -1,4 +1,4 @@
-package au.edu.federation.itech3107.fedunimillionaire30360914;
+package au.edu.federation.itech3107.fedunimillionaire30360914.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,6 +13,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import au.edu.federation.itech3107.fedunimillionaire30360914.R;
 import au.edu.federation.itech3107.fedunimillionaire30360914.controllers.QuestionListAdapter;
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;

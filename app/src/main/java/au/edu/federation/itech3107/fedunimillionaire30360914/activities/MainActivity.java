@@ -1,4 +1,4 @@
-package au.edu.federation.itech3107.fedunimillionaire30360914;
+package au.edu.federation.itech3107.fedunimillionaire30360914.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import au.edu.federation.itech3107.fedunimillionaire30360914.R;
 
 import static au.edu.federation.itech3107.fedunimillionaire30360914.utils.MyString.capitalise;
 

@@ -1,4 +1,4 @@
-package au.edu.federation.itech3107.fedunimillionaire30360914;
+package au.edu.federation.itech3107.fedunimillionaire30360914.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,13 +19,14 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import au.edu.federation.itech3107.fedunimillionaire30360914.R;
 import au.edu.federation.itech3107.fedunimillionaire30360914.controllers.QuizHandler;
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank;
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.ScoreDataSource;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
 
-import static au.edu.federation.itech3107.fedunimillionaire30360914.MainActivity.EXTRA_HOT_MODE;
-import static au.edu.federation.itech3107.fedunimillionaire30360914.MainActivity.EXTRA_PLAYER_NAME;
+import static au.edu.federation.itech3107.fedunimillionaire30360914.activities.MainActivity.EXTRA_HOT_MODE;
+import static au.edu.federation.itech3107.fedunimillionaire30360914.activities.MainActivity.EXTRA_PLAYER_NAME;
 
 
 public class GameActivity extends AppCompatActivity {

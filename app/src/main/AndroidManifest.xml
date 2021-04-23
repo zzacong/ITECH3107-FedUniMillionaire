@@ -9,18 +9,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FedUniMillionaire30360914">
-        <activity android:name=".QuestionActivity"></activity>
+        <activity android:name=".activities.QuestionActivity"></activity>
         <activity
-            android:name=".ScoresActivity"
+            android:name=".activities.ScoresActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".EndgameActivity"
+            android:name=".activities.EndgameActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".GameActivity"
+            android:name=".activities.GameActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

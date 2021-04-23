@@ -1,4 +1,4 @@
-package au.edu.federation.itech3107.fedunimillionaire30360914;
+package au.edu.federation.itech3107.fedunimillionaire30360914.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+
+import au.edu.federation.itech3107.fedunimillionaire30360914.R;
 
 public class EndgameActivity extends AppCompatActivity {
 
