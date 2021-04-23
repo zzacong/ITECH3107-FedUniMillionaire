@@ -2,15 +2,9 @@ package au.edu.federation.itech3107.fedunimillionaire30360914.helpers;
 
 import android.content.Context;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -20,6 +14,9 @@ import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Dif
 import static au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionOpenHelper.EASY_QUESTIONS_FILENAME;
 import static au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionOpenHelper.HARD_QUESTIONS_FILENAME;
 import static au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionOpenHelper.MEDIUM_QUESTIONS_FILENAME;
+import static au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Difficulty.easy;
+import static au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Difficulty.hard;
+import static au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Difficulty.medium;
 
 public class QuestionBank {
 
@@ -42,57 +39,53 @@ public class QuestionBank {
 
     private static final String LOG_TAG = QuestionBank.class.getSimpleName();
 
+    private Map<Difficulty, List<Question>> questionsMap = new HashMap<>();;
     private QuestionOpenHelper questionOpenHelper;
-    private ArrayList<Question> easyQuestions;
-    private ArrayList<Question> mediumQuestions;
-    private ArrayList<Question> hardQuestions;
 
 
     public QuestionBank(Context context) {
         this.questionOpenHelper = new QuestionOpenHelper(context);
-        this.easyQuestions = getEasyQuestions();
-        this.mediumQuestions = getMediumQuestions();
-        this.hardQuestions = getHardQuestions();
+        updateQuestion();
     }
 
-    public ArrayList<Question> getQuestions() {
-        ArrayList<Question> questionList = new ArrayList<>();
+    public List<Question> getQuizQuestions() {
+        List<Question> questionList = new ArrayList<>();
 
-        int easyNumber = 5;
-        int mediumNumber = 4;
-        int hardNumber = 2;
+        final int easyNumber = 5;
+        final int mediumNumber = 4;
+        final int hardNumber = 2;
 
-        for (int i : randomArrayInt(easyQuestions.size(), easyNumber)) {
-            questionList.add(easyQuestions.get(i));
+        for (int i : randomArrayInt(questionsMap.get(easy).size(), easyNumber)) {
+            questionList.add(questionsMap.get(easy).get(i));
         }
 
-        for (int i : randomArrayInt(mediumQuestions.size(), mediumNumber)) {
-            questionList.add(mediumQuestions.get(i));
+        for (int i : randomArrayInt(questionsMap.get(medium).size(), mediumNumber)) {
+            questionList.add(questionsMap.get(medium).get(i));
         }
 
-        for (int i : randomArrayInt(hardQuestions.size(), hardNumber)) {
-            questionList.add(hardQuestions.get(i));
+        for (int i : randomArrayInt(questionsMap.get(hard).size(), hardNumber)) {
+            questionList.add(questionsMap.get(hard).get(i));
         }
 
         return questionList;
     }
 
-    public ArrayList<Question> getEasyQuestions() {
-        return questionOpenHelper.readQuestionsFromTextFile(EASY_QUESTIONS_FILENAME);
+    public List<Question> getQuestions(Difficulty difficulty) {
+        return questionsMap.get(difficulty);
     }
 
-    public ArrayList<Question> getMediumQuestions() {
-        return questionOpenHelper.readQuestionsFromTextFile(MEDIUM_QUESTIONS_FILENAME);
+    public void updateQuestion() {
+        questionsMap.put(easy, questionOpenHelper.readQuestionsFromFile(EASY_QUESTIONS_FILENAME));
+        questionsMap.put(medium, questionOpenHelper.readQuestionsFromFile(MEDIUM_QUESTIONS_FILENAME));
+        questionsMap.put(hard, questionOpenHelper.readQuestionsFromFile(HARD_QUESTIONS_FILENAME));
     }
 
-    public ArrayList<Question> getHardQuestions() {
-        return questionOpenHelper.readQuestionsFromTextFile(HARD_QUESTIONS_FILENAME);
     }
 
     private Integer[] randomArrayInt(int max, int size) {
         if (max < size) throw new IllegalArgumentException("Size must be greater than max.");
 
-        ArrayList<Integer> list = new ArrayList<>();
+        List<Integer> list = new ArrayList<>();
         Random rand = new Random();
 
         do {
