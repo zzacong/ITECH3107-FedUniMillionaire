@@ -18,7 +18,7 @@ import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
 
 public class QuestionListAdapter extends RecyclerView.Adapter<QuestionListAdapter.ViewHolder> {
 
-    public static final String LOG_TAG = ScoreListAdapter.class.getSimpleName();
+    public static final String LOG_TAG = QuestionListAdapter.class.getSimpleName();
 
     private List<Question> localDataSet;
 
@@ -43,15 +43,14 @@ public class QuestionListAdapter extends RecyclerView.Adapter<QuestionListAdapte
 
     public QuestionListAdapter(List<Question> localDataSet) {
         this.localDataSet = localDataSet;
-        Log.d(LOG_TAG, this.localDataSet.size() + "");
     }
 
-    public void addScore(Question score) {
-        localDataSet.add(score);
+    public void addItem(Question item) {
+        localDataSet.add(item);
         notifyItemInserted(localDataSet.size() - 1);
     }
 
-    public void deleteScores() {
+    public void deleteItems() {
         List<Question> questionToDelete = new ArrayList<>();
         for (Question q : localDataSet) {
             if (q.isChecked) {
@@ -78,7 +77,6 @@ public class QuestionListAdapter extends RecyclerView.Adapter<QuestionListAdapte
     @Override
     public void onBindViewHolder(@NonNull QuestionListAdapter.ViewHolder holder, int position) {
         Question question = localDataSet.get(position);
-        Log.d(LOG_TAG, question.toString());
 
         holder.tvQuestionTitle.setText(question.getTitle());
         holder.tvDifficulty.setText(question.getDifficulty().toString());

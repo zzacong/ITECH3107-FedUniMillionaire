@@ -80,6 +80,26 @@ public class QuestionBank {
         questionsMap.put(hard, questionOpenHelper.readQuestionsFromFile(HARD_QUESTIONS_FILENAME));
     }
 
+    public boolean addQuestions(Question question) {
+        String fileName = "";
+        switch (question.getDifficulty()) {
+            case easy:
+                fileName = EASY_QUESTIONS_FILENAME;
+                break;
+            case medium:
+                fileName = MEDIUM_QUESTIONS_FILENAME;
+                break;
+            case hard:
+                fileName = HARD_QUESTIONS_FILENAME;
+                break;
+        }
+
+        if (questionOpenHelper.addQuestionToFile(fileName, question)) {
+            // New question successfully added, now update memory of question list
+            updateQuestion();
+            return true;
+        }
+        return false;
     }
 
     private Integer[] randomArrayInt(int max, int size) {

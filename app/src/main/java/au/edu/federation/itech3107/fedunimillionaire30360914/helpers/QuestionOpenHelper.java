@@ -73,6 +73,23 @@ public class QuestionOpenHelper {
         }
         return questionList;
     }
+
+    public boolean addQuestionToFile(String fileName, Question question) {
+        try {
+            JSONArray questionsArr = getQuestionAsJSONArray(fileName);
+            questionsArr.put(question.toJSONObj());
+            writeJSONArrayToFile(fileName, questionsArr);
+            return true;
+        } catch (JSONException | IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public void deleteQuestionFromFile(String filename, Question question) {
+
+    }
+
     private JSONArray getQuestionAsJSONArray(String fileName) throws JSONException, IOException {
         InputStream inputStream = null;
         try {
@@ -101,4 +118,13 @@ public class QuestionOpenHelper {
         return json.getJSONArray("questions");
     }
 
+    private void writeJSONArrayToFile(String fileName, JSONArray questionArray) throws JSONException, IOException {
+        JSONObject json = new JSONObject();
+        json.put("questions", questionArray);
+
+        // Write JSON to file
+        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(context.openFileOutput(fileName, Context.MODE_PRIVATE)));
+        bufferedWriter.write(json.toString(2));
+        bufferedWriter.close();
+    }
 }

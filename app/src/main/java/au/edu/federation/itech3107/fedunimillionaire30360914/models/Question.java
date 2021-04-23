@@ -76,6 +76,37 @@ public class Question {
         return choice == answer;
     }
 
+    public JSONObject toJSONObj() {
+        JSONObject json = new JSONObject();
+        try {
+            JSONArray arr = new JSONArray();
+            for (int i = 0; i < choices.size(); i++) {
+                if (i == answer) continue;
+                arr.put(choices.get(i));
+            }
 
+            json.put("category", "General Knowledge");
+            json.put("type", "multiple");
+            json.put("difficulty", getDifficulty().toString());
+            json.put("question", getTitle());
+            json.put("correct_answer", choices.get(answer));
+            json.put("incorrect_answers", arr);
 
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Log.d(LOG_TAG, json.toString());
+        return json;
+    }
+
+    @Override
+    public String toString() {
+        return "Question {" +
+                "difficulty=" + difficulty +
+                ", choices=" + choices +
+                ", title='" + title + '\'' +
+                ", answer=" + answer +
+                ", isChecked=" + isChecked +
+                '}';
+    }
 }
