@@ -45,6 +45,10 @@ public class QuestionListAdapter extends RecyclerView.Adapter<QuestionListAdapte
         this.localDataSet = localDataSet;
     }
 
+    public List<Question> getDataSet() {
+        return localDataSet;
+    }
+
     public void addItem(Question item) {
         localDataSet.add(item);
         notifyItemInserted(localDataSet.size() - 1);

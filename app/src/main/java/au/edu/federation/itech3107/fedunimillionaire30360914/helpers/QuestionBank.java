@@ -102,6 +102,28 @@ public class QuestionBank {
         return false;
     }
 
+    public boolean writeQuestions(List<Question> questionsList, Difficulty difficulty) {
+        String fileName = "";
+        switch (difficulty) {
+            case easy:
+                fileName = EASY_QUESTIONS_FILENAME;
+                break;
+            case medium:
+                fileName = MEDIUM_QUESTIONS_FILENAME;
+                break;
+            case hard:
+                fileName = HARD_QUESTIONS_FILENAME;
+                break;
+        }
+
+        if (questionOpenHelper.writeQuestionsToFile(fileName, questionsList)) {
+            // Questions overridden successfully, now update memory of question list
+            updateQuestion();
+            return true;
+        }
+        return false;
+    }
+
     private Integer[] randomArrayInt(int max, int size) {
         if (max < size) throw new IllegalArgumentException("Size must be greater than max.");
 

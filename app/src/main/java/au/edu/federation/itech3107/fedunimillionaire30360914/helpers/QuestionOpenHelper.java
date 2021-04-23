@@ -86,8 +86,19 @@ public class QuestionOpenHelper {
         }
     }
 
-    public void deleteQuestionFromFile(String filename, Question question) {
+    public boolean writeQuestionsToFile(String fileName, List<Question> questionList) {
+        JSONArray arr = new JSONArray();
+        for (Question question : questionList) {
+            arr.put(question.toJSONObj());
+        }
 
+        try {
+            writeJSONArrayToFile(fileName, arr);
+            return true;
+        } catch (JSONException | IOException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private JSONArray getQuestionAsJSONArray(String fileName) throws JSONException, IOException {

@@ -99,6 +99,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:backgroundTint="@android:color/holo_red_dark"
+            android:onClick="deleteQuestions"
             android:text="@string/delete"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/rvQuestionList" />

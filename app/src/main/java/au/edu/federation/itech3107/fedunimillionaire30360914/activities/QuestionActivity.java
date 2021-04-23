@@ -13,6 +13,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import au.edu.federation.itech3107.fedunimillionaire30360914.R;
 import au.edu.federation.itech3107.fedunimillionaire30360914.controllers.QuestionListAdapter;
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank;
@@ -146,5 +149,27 @@ public class QuestionActivity extends AppCompatActivity {
         }
         tvQuestionFormError.setText("");
         return true;
+    }
+
+    public void deleteQuestions(View view) {
+        List<Question> questionList = questionListAdapter.getDataSet();
+        List<Question> questionToDelete = new ArrayList<>();
+
+        // For every question, check if the checkbox is selected
+        for (Question q : questionList) {
+            if (q.isChecked) {
+                questionToDelete.add(q);
+            }
+        }
+        // Remove all selected questions
+        questionList.removeAll(questionToDelete);
+
+        // Override the filtered question list back its file
+        if (questionBank.writeQuestions(questionList, difficulty)) {
+            questionListAdapter.notifyDataSetChanged();
+            Toast.makeText(this, "Questions successfully deleted!", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Questions delete failed.", Toast.LENGTH_SHORT).show();
+        }
     }
 }
