@@ -1,6 +1,5 @@
 package au.edu.federation.itech3107.fedunimillionaire30360914.controllers;
 
-import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,18 +10,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import au.edu.federation.itech3107.fedunimillionaire30360914.R;
-import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.ScoreDataSource;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Score;
 
 public class ScoreListAdapter extends RecyclerView.Adapter<ScoreListAdapter.ViewHolder> {
 
     public static final String LOG_TAG = ScoreListAdapter.class.getSimpleName();
 
-    private Context context;
     private List<Score> localDataSet;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -39,39 +35,18 @@ public class ScoreListAdapter extends RecyclerView.Adapter<ScoreListAdapter.View
         }
     }
 
-    public ScoreListAdapter(Context context, List<Score> localDataSet) {
-        this.context = context;
+    public ScoreListAdapter(List<Score> localDataSet) {
         this.localDataSet = localDataSet;
         Log.d(LOG_TAG, this.localDataSet.size() + "");
     }
 
-    public void addScore(Score score) {
-        localDataSet.add(score);
-        notifyItemInserted(localDataSet.size() - 1);
-    }
-
-    public void deleteScores() {
-        List<Score> scoreToDelete = new ArrayList<>();
-        for (Score sc : localDataSet) {
-            if (sc.isChecked) {
-                scoreToDelete.add(sc);
-                deleteFromDatabase(sc);
-            }
-        }
-        localDataSet.removeAll(scoreToDelete);
-        notifyDataSetChanged();
+    public List<Score> getDataSet() {
+        return localDataSet;
     }
 
     public void refresh(List<Score> dataSet) {
         this.localDataSet = dataSet;
         notifyDataSetChanged();
-    }
-
-    public void deleteFromDatabase(Score score) {
-        ScoreDataSource dataSource = new ScoreDataSource(context);
-        dataSource.open();
-        dataSource.delete(score);
-        dataSource.close();
     }
 
     @NonNull

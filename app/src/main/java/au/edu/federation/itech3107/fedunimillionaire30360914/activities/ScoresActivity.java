@@ -27,7 +27,6 @@ public class ScoresActivity extends AppCompatActivity {
     private TextView tvMoneyHeader, tvDatetimeHeader;
     private RecyclerView rvScores;
 
-    private List<Score> scoreList = new ArrayList<>();
     private ScoreListAdapter scoreListAdapter;
 
     private boolean moneyOrder = true;
@@ -45,10 +44,7 @@ public class ScoresActivity extends AppCompatActivity {
         arrowUpward = getDrawable(R.drawable.arrow_upward);
         arrowDownward = getDrawable(R.drawable.arrow_downward);
 
-        scoreList = getAllRecordsFromDatabase(ScoreSQLiteOpenHelper.COLUMN_DATETIME, ScoreDataSource.ASC);
-        Log.d(LOG_TAG, "" + scoreList.size());
-
-        scoreListAdapter = new ScoreListAdapter(this, scoreList);
+        scoreListAdapter = new ScoreListAdapter(getAllRecordsFromDatabase(ScoreSQLiteOpenHelper.COLUMN_DATETIME, ScoreDataSource.ASC));
 
         rvScores.setLayoutManager(new LinearLayoutManager(this));
         rvScores.setAdapter(scoreListAdapter);
@@ -94,6 +90,26 @@ public class ScoresActivity extends AppCompatActivity {
     }
 
     public void deleteScores(View view) {
-        scoreListAdapter.deleteScores();
+        List<Score> scoreList = scoreListAdapter.getDataSet();
+        List<Score> scoresToDelete = new ArrayList<>();
+
+        // For every score, check if it is checked for delete
+        for (Score sc : scoreList) {
+            if (sc.isChecked) {
+                scoresToDelete.add(sc);
+                // Delete the score record from database if checked
+                deleteFromDatabase(sc);
+            }
+        }
+        // Remove all selected scores
+        scoreList.removeAll(scoresToDelete);
+        scoreListAdapter.notifyDataSetChanged();
+    }
+
+    public void deleteFromDatabase(Score score) {
+        ScoreDataSource dataSource = new ScoreDataSource(this);
+        dataSource.open();
+        dataSource.delete(score);
+        dataSource.close();
     }
 }
