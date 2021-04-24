@@ -15,6 +15,9 @@ import java.util.List;
 import au.edu.federation.itech3107.fedunimillionaire30360914.R;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Score;
 
+/**
+ * Use of RecyclerView adapter with checkboxes | Referenced from https://www.youtube.com/watch?v=BBWyXo-3JGQ
+ */
 public class ScoreListAdapter extends RecyclerView.Adapter<ScoreListAdapter.ViewHolder> {
 
     public static final String LOG_TAG = ScoreListAdapter.class.getSimpleName();

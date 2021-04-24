@@ -15,6 +15,9 @@ import java.util.List;
 import au.edu.federation.itech3107.fedunimillionaire30360914.R;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
 
+/**
+ * Use of RecyclerView adapter with checkboxes | Referenced from https://www.youtube.com/watch?v=BBWyXo-3JGQ
+ */
 public class QuestionListAdapter extends RecyclerView.Adapter<QuestionListAdapter.ViewHolder> {
 
     public static final String LOG_TAG = QuestionListAdapter.class.getSimpleName();
