@@ -1,24 +1,22 @@
 package au.edu.federation.itech3107.fedunimillionaire30360914.controllers;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
 
 import static au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank.QUESTION_VALUE_SAFE_MONEY_LIST;
 
-public class QuestionAdapter {
+public class QuizHandler {
 
     private final int MAX = 11;
-    private final ArrayList<Question> questionList;
-    private QuestionBank questionBank;
+    private final List<Question> questionList;
     private Integer currentNumber = 0;
     private Integer questionsLeft = MAX - currentNumber;
 
 
-    public QuestionAdapter(QuestionBank questionBank) {
-        this.questionBank = questionBank;
-        this.questionList = questionBank.getQuestions();
+    public QuizHandler(QuestionBank questionBank) {
+        this.questionList = questionBank.getQuizQuestions();
     }
 
     public Integer getCurrentNumber() {

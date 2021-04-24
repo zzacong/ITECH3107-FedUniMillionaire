@@ -12,6 +12,9 @@ import java.util.List;
 
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Score;
 
+/**
+ * How to order SQLite database in desc/asc | Referenced from https://stackoverflow.com/questions/8948435/how-do-i-order-my-sqlite-database-in-descending-order-for-an-android-app
+ */
 public class ScoreDataSource {
 
     public static final String ASC = " ASC";
@@ -125,7 +128,7 @@ public class ScoreDataSource {
         // Move to the first row
         cursor.moveToFirst();
 
-        // extract every row as a Score object and add to score ArrayList
+        // extract every row as a Score object and add to score List
         while (!cursor.isAfterLast()) {
             Score score = cursorToScore(cursor);
             scoreList.add(score);

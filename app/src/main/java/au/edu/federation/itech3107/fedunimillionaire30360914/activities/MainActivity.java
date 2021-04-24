@@ -1,6 +1,4 @@
-package au.edu.federation.itech3107.fedunimillionaire30360914;
-
-import androidx.appcompat.app.AppCompatActivity;
+package au.edu.federation.itech3107.fedunimillionaire30360914.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +6,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import au.edu.federation.itech3107.fedunimillionaire30360914.R;
 
 import static au.edu.federation.itech3107.fedunimillionaire30360914.utils.MyString.capitalise;
 
@@ -60,7 +62,14 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private boolean validPlayerName() {
+    // Called when user press edit question button, open the QuestionActivity
+    public void editQuestions(View view) {
+        Log.d(LOG_TAG, "[EDIT QUESTIONS]");
+        Intent intent = new Intent(this, QuestionActivity.class);
+        startActivity(intent);
+    }
+
+    public boolean validPlayerName() {
         String name = etPlayerName.getText().toString();
         boolean isValid = true;
 

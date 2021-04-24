@@ -1,4 +1,4 @@
-package au.edu.federation.itech3107.fedunimillionaire30360914;
+package au.edu.federation.itech3107.fedunimillionaire30360914.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,28 +9,30 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import au.edu.federation.itech3107.fedunimillionaire30360914.controllers.QuestionAdapter;
+import au.edu.federation.itech3107.fedunimillionaire30360914.R;
+import au.edu.federation.itech3107.fedunimillionaire30360914.controllers.QuizHandler;
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank;
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.ScoreDataSource;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
-import au.edu.federation.itech3107.fedunimillionaire30360914.models.Score;
 
-import static au.edu.federation.itech3107.fedunimillionaire30360914.MainActivity.EXTRA_HOT_MODE;
-import static au.edu.federation.itech3107.fedunimillionaire30360914.MainActivity.EXTRA_PLAYER_NAME;
+import static au.edu.federation.itech3107.fedunimillionaire30360914.activities.MainActivity.EXTRA_HOT_MODE;
+import static au.edu.federation.itech3107.fedunimillionaire30360914.activities.MainActivity.EXTRA_PLAYER_NAME;
 
-
+/**
+ * Datetime formatting to String | Referenced from https://www.javatpoint.com/java-simpledateformat
+ * Get current datetime | Referenced from https://stackoverflow.com/questions/5369682/how-to-get-current-time-and-date-in-android
+ */
 public class GameActivity extends AppCompatActivity {
 
     public static final String EXTRA_RESULT = "au.edu.federation.itech3107.fedunimillionaire.extra.RESULT";
@@ -51,7 +53,7 @@ public class GameActivity extends AppCompatActivity {
     private RadioButton radA, radB, radC, radD;
     private Button btnSubmit;
 
-    private QuestionAdapter questionAdapter;
+    private QuizHandler quizHandler;
     private Question question;
 
     private Handler handler;
@@ -93,9 +95,9 @@ public class GameActivity extends AppCompatActivity {
             handler = new Handler();
         }
 
-        // Instantiate a new QuestionAdapter to manage the quiz questions
-        questionAdapter = new QuestionAdapter(new QuestionBank(this));
-        this.question = questionAdapter.startFrom(0);
+        // Instantiate a new QuizHandler to manage the quiz questions
+        quizHandler = new QuizHandler(new QuestionBank(this));
+        this.question = quizHandler.startFrom(0);
         nextQuestion();
     }
 
@@ -114,14 +116,15 @@ public class GameActivity extends AppCompatActivity {
             // Check player has selected the correct answer;
             if (question.attempt(selectedIndex)) {
                 Log.d(LOG_TAG, "[CORRECT]");
-                this.question = questionAdapter.nextQuestion();
+                this.question = quizHandler.nextQuestion();
                 nextQuestion();
             } else {
-                Log.d(LOG_TAG, "[WRONG] Current question: " + questionAdapter.getCurrentNumber());
+                Log.d(LOG_TAG, "[WRONG] Current question: " + quizHandler.getCurrentNumber());
                 endGame(false);
             }
         } else {
             Log.d(LOG_TAG, "[INVALID] No answer selected");
+            Toast.makeText(this, "Please select an answer.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -135,12 +138,12 @@ public class GameActivity extends AppCompatActivity {
             radC.setText(question.getChoices().get(2));
             radD.setText(question.getChoices().get(3));
 
-            Integer currentNumber = questionAdapter.getCurrentNumber();
-            tvDollarValue.setText(questionAdapter.getQuestionValue().toString());
-            tvSafeMoney.setText(questionAdapter.getSafeMoneyValue().toString());
+            Integer currentNumber = quizHandler.getCurrentNumber();
+            tvDollarValue.setText(quizHandler.getQuestionValue().toString());
+            tvSafeMoney.setText(quizHandler.getSafeMoneyValue().toString());
             tvDifficulty.setText(question.getDifficulty().toString());
             tvQuestionNumber.setText(currentNumber.toString());
-            tvQuestionsLeft.setText(questionAdapter.getQuestionsLeft().toString());
+            tvQuestionsLeft.setText(quizHandler.getQuestionsLeft().toString());
 
             // Reset hot seat timer
             if (isHotMode) {
@@ -170,7 +173,7 @@ public class GameActivity extends AppCompatActivity {
         // Pass the result (win/lose)
         intent.putExtra(EXTRA_RESULT, result);
         // Pass the amount of money 'win'
-        intent.putExtra(EXTRA_DOLLAR, questionAdapter.getSafeMoneyValue().toString());
+        intent.putExtra(EXTRA_DOLLAR, quizHandler.getSafeMoneyValue().toString());
 
         if (message != null)
             // Pass any optional message to replace the default endgame-message
@@ -183,9 +186,9 @@ public class GameActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (questionAdapter.getCurrentNumber() > 1) {
-            Log.d(LOG_TAG, "[SAVING STATE] Current question: " + questionAdapter.getCurrentNumber());
-            outState.putInt(OUTSTATE_QUESTION_NO, questionAdapter.getCurrentNumber());
+        if (quizHandler.getCurrentNumber() > 1) {
+            Log.d(LOG_TAG, "[SAVING STATE] Current question: " + quizHandler.getCurrentNumber());
+            outState.putInt(OUTSTATE_QUESTION_NO, quizHandler.getCurrentNumber());
         }
     }
 
@@ -194,7 +197,7 @@ public class GameActivity extends AppCompatActivity {
         super.onRestoreInstanceState(savedInstanceState);
         int number = savedInstanceState.getInt(OUTSTATE_QUESTION_NO);
         Log.d(LOG_TAG, "[RESTORING STATE] Current question: " + number);
-        this.question = questionAdapter.startFrom(number);
+        this.question = quizHandler.startFrom(number);
         nextQuestion();
     }
 
@@ -213,7 +216,7 @@ public class GameActivity extends AppCompatActivity {
         ScoreDataSource dataSource = new ScoreDataSource(this);
         dataSource.open();
         // Add player's score to database
-        dataSource.insert(playerName, questionAdapter.getSafeMoneyValue(), formattedDate);
+        dataSource.insert(playerName, quizHandler.getSafeMoneyValue(), formattedDate);
         dataSource.close();
     }
 

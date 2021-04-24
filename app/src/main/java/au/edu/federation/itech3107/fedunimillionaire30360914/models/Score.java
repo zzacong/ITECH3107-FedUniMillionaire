@@ -6,7 +6,7 @@ public class Score {
     private String name;
     private int money;
     private String datetime;
-    public boolean isChecked = false;
+    private boolean isChecked = false;
 
     public Score(String name, int money, String datetime) {
         this.name = name;
@@ -44,6 +44,14 @@ public class Score {
 
     public void setDatetime(String datetime) {
         this.datetime = datetime;
+    }
+
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        isChecked = checked;
     }
 
     @Override
