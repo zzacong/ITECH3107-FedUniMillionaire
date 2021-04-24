@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -123,6 +124,7 @@ public class GameActivity extends AppCompatActivity {
             }
         } else {
             Log.d(LOG_TAG, "[INVALID] No answer selected");
+            Toast.makeText(this, "Please select an answer.", Toast.LENGTH_SHORT).show();
         }
     }
 

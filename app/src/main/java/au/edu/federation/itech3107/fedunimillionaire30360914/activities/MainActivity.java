@@ -1,13 +1,13 @@
 package au.edu.federation.itech3107.fedunimillionaire30360914.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import au.edu.federation.itech3107.fedunimillionaire30360914.R;
 
