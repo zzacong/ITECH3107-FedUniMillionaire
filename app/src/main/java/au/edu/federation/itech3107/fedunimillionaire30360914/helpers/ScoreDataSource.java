@@ -12,6 +12,9 @@ import java.util.List;
 
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Score;
 
+/**
+ * How to order SQLite database in desc/asc | Referenced from https://stackoverflow.com/questions/8948435/how-do-i-order-my-sqlite-database-in-descending-order-for-an-android-app
+ */
 public class ScoreDataSource {
 
     public static final String ASC = " ASC";

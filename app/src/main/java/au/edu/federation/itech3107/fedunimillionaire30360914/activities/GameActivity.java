@@ -28,7 +28,10 @@ import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
 import static au.edu.federation.itech3107.fedunimillionaire30360914.activities.MainActivity.EXTRA_HOT_MODE;
 import static au.edu.federation.itech3107.fedunimillionaire30360914.activities.MainActivity.EXTRA_PLAYER_NAME;
 
-
+/**
+ * Datetime formatting to String | Referenced from https://www.javatpoint.com/java-simpledateformat
+ * Get current datetime | Referenced from https://stackoverflow.com/questions/5369682/how-to-get-current-time-and-date-in-android
+ */
 public class GameActivity extends AppCompatActivity {
 
     public static final String EXTRA_RESULT = "au.edu.federation.itech3107.fedunimillionaire.extra.RESULT";

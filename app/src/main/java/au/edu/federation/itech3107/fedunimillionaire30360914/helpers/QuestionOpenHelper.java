@@ -10,7 +10,6 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,6 +20,10 @@ import java.util.Random;
 
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
 
+/**
+ * Use of JSONObject and JSONArray | Referenced from https://stackoverflow.com/questions/2591098/how-to-parse-json-in-java
+ *
+ */
 public class QuestionOpenHelper {
 
     public static final String EASY_QUESTIONS_FILENAME = "questions-easy.txt";

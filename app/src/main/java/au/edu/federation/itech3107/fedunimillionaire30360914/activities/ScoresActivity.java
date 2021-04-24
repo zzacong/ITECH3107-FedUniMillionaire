@@ -20,6 +20,9 @@ import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.ScoreDataSo
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.ScoreSQLiteOpenHelper;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Score;
 
+/**
+ * Add icon at side of TextView | Referenced from https://stackoverflow.com/questions/25279715/android-how-to-add-icon-at-the-left-side-of-the-textview
+ */
 public class ScoresActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = ScoresActivity.class.getSimpleName();
