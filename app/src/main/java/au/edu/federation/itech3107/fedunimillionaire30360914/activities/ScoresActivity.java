@@ -47,6 +47,8 @@ public class ScoresActivity extends AppCompatActivity {
 
         arrowUpward = getDrawable(R.drawable.arrow_upward);
         arrowDownward = getDrawable(R.drawable.arrow_downward);
+        arrowUpward.setTint(getColor(R.color.white));
+        arrowDownward.setTint(getColor(R.color.white));
 
         scoreListAdapter = new ScoreListAdapter(getAllRecordsFromDatabase(ScoreSQLiteOpenHelper.COLUMN_DATETIME, ScoreDataSource.ASC));
 
