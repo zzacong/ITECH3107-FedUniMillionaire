@@ -1,10 +1,14 @@
 package au.edu.federation.itech3107.fedunimillionaire30360914.activities;
 
+import android.animation.Animator;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -13,6 +17,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -48,10 +55,12 @@ public class GameActivity extends AppCompatActivity {
     private final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat(DATETIME_FORMAT);
 
 
+    private CardView cvLifelines;
     private TextView tvDollarValue, tvSafeMoney, tvDifficulty, tvQuestionsLeft, tvQuestionNumber, tvQuestionTitle, tvTimer;
     private RadioGroup radGroup;
     private RadioButton radA, radB, radC, radD;
     private Button btnSubmit;
+    private FloatingActionButton fabHelp;
 
     private QuizHandler quizHandler;
     private Question question;
@@ -70,6 +79,7 @@ public class GameActivity extends AppCompatActivity {
         Log.d(LOG_TAG, "[ON_CREATE]");
 
         // Link variables to screen components
+        cvLifelines = findViewById(R.id.cvLifelines);
         tvDollarValue = findViewById(R.id.tvDollarValue);
         tvSafeMoney = findViewById(R.id.tvSafeMoney);
         tvDifficulty = findViewById(R.id.tvDfficulty);
@@ -83,6 +93,7 @@ public class GameActivity extends AppCompatActivity {
         radC = findViewById(R.id.radC);
         radD = findViewById(R.id.radD);
         btnSubmit = findViewById(R.id.btnSubmit);
+        fabHelp = findViewById(R.id.fabHelp);
 
         // Get intent extra passed from MainActivity
         Intent intent = getIntent();
@@ -244,6 +255,60 @@ public class GameActivity extends AppCompatActivity {
         }
     };
 
+    // Called when user press the lifelines button on the bottom right of screen
+    public void callLifeLines(View view) {
+        view.setVisibility(View.INVISIBLE);
+        circularRevealCard(cvLifelines);
+    }
+
+    /**
+     * reference: https://stackoverflow.com/a/42114635
+     */
+    // Animator function
+    private void circularRevealCard(View view) {
+        float finalRadius = Math.max(view.getWidth(), view.getHeight());
+        // create the animator which display the card view
+        // in a circular motion that starts from right
+        Animator circularReveal = ViewAnimationUtils.createCircularReveal(view, view.getWidth(), 0, 0, finalRadius * 1.1f);
+        circularReveal.setDuration(500);
+        // make the view visible and start the animation
+        view.setVisibility(View.VISIBLE);
+        circularReveal.start();
+    }
+
+    /**
+     * reference: https://stackoverflow.com/a/32105890
+     */
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        Rect viewRect = new Rect();
+        cvLifelines.getGlobalVisibleRect(viewRect);
+        if (!viewRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
+            cvLifelines.setVisibility(View.INVISIBLE);
+            fabHelp.setVisibility(View.VISIBLE);
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
+    // Called when one of the lifeline buttons is pressed
+    public void handleLifelines(View view) {
+        switch(view.getId()) {
+            case R.id.btnFifty:
+                Log.d(LOG_TAG, "[LIFELINES] 50:50");
+                break;
+            case R.id.btnAudience:
+                Log.d(LOG_TAG, "[LIFELINES] Ask audience");
+                break;
+            case R.id.btnSwitch:
+                Log.d(LOG_TAG, "[LIFELINES] Switch");
+                break;
+        }
+    }
+
+
+    /**
+     * Private classes
+     */
     private class DisplaySecondsTask extends TimerTask {
         int seconds;
 
