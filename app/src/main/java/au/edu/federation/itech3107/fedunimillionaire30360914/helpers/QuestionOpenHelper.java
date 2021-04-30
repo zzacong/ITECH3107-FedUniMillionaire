@@ -116,19 +116,19 @@ public class QuestionOpenHelper {
             inputStream = context.getAssets().open(fileName);
         }
 
-        String fullText = "";
-        String line = null;
+        StringBuilder stringBuilder = new StringBuilder();
+        String line;
 
         // Use BufferedReader to read text
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
         // Read each line and append it to the fullText
         while ((line = bufferedReader.readLine()) != null) {
-            fullText += line;
+            stringBuilder.append(line).append(System.lineSeparator());
         }
         bufferedReader.close();
 
         // Parse the fullText into a JSON object, then get the questions JSON array
-        JSONObject json = new JSONObject(fullText);
+        JSONObject json = new JSONObject(stringBuilder.toString());
         return json.getJSONArray("questions");
     }
 
