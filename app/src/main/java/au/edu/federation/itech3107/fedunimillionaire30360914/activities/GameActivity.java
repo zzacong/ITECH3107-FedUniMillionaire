@@ -24,6 +24,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -59,17 +60,17 @@ public class GameActivity extends AppCompatActivity {
     private TextView tvDollarValue, tvSafeMoney, tvDifficulty, tvQuestionsLeft, tvQuestionNumber, tvQuestionTitle, tvTimer;
     private RadioGroup radGroup;
     private RadioButton radA, radB, radC, radD;
-    private Button btnSubmit;
+    private Button btnSubmit, btnFiftyfifty, btnAudience, btnSwitch;
     private FloatingActionButton fabHelp;
 
     private QuizHandler quizHandler;
-    private Question question;
 
     private Handler handler;
     private Timer timer;
 
     private boolean isHotMode;
     private String playerName;
+    private boolean canUseLifeline[] = {true, true, true};
 
 
     @Override
@@ -93,6 +94,9 @@ public class GameActivity extends AppCompatActivity {
         radC = findViewById(R.id.radC);
         radD = findViewById(R.id.radD);
         btnSubmit = findViewById(R.id.btnSubmit);
+//        btnFiftyfifty = findViewById(R.id.btnFiftyfifty);
+//        btnAudience = findViewById(R.id.btnAudience);
+//        btnSwitch = findViewById(R.id.btnSwitch);
         fabHelp = findViewById(R.id.fabHelp);
 
         // Get intent extra passed from MainActivity
@@ -108,8 +112,7 @@ public class GameActivity extends AppCompatActivity {
 
         // Instantiate a new QuizHandler to manage the quiz questions
         quizHandler = new QuizHandler(new QuestionBank(this));
-        this.question = quizHandler.startFrom(0);
-        nextQuestion();
+        updateQuestionView(quizHandler.startFrom(1));
     }
 
     // Called when users press submit button
@@ -125,10 +128,9 @@ public class GameActivity extends AppCompatActivity {
             int selectedIndex = radGroup.indexOfChild(findViewById(selectedRadId));
 
             // Check player has selected the correct answer;
-            if (question.attempt(selectedIndex)) {
+            if (quizHandler.currentQuestion().attempt(selectedIndex)) {
                 Log.d(LOG_TAG, "[CORRECT]");
-                this.question = quizHandler.nextQuestion();
-                nextQuestion();
+                updateQuestionView(quizHandler.nextQuestion());
             } else {
                 Log.d(LOG_TAG, "[WRONG] Current question: " + quizHandler.getCurrentNumber());
                 endGame(false);
@@ -140,14 +142,16 @@ public class GameActivity extends AppCompatActivity {
     }
 
     // Display current question dollar value, safe money amount and show the questions and choices
-    private void nextQuestion() {
+    private void updateQuestionView(Question question) {
         if (question != null) {
             radGroup.clearCheck();
             tvQuestionTitle.setText(question.getTitle());
-            radA.setText(question.getChoices().get(0));
-            radB.setText(question.getChoices().get(1));
-            radC.setText(question.getChoices().get(2));
-            radD.setText(question.getChoices().get(3));
+
+            for (int i = 0; i < 4; i++) {
+                RadioButton radButton = (RadioButton) radGroup.getChildAt(i);
+                radButton.setEnabled(true);
+                radButton.setText(question.getChoices().get(i));
+            }
 
             Integer currentNumber = quizHandler.getCurrentNumber();
             tvDollarValue.setText(quizHandler.getQuestionValue().toString());
@@ -208,8 +212,7 @@ public class GameActivity extends AppCompatActivity {
         super.onRestoreInstanceState(savedInstanceState);
         int number = savedInstanceState.getInt(OUTSTATE_QUESTION_NO);
         Log.d(LOG_TAG, "[RESTORING STATE] Current question: " + number);
-        this.question = quizHandler.startFrom(number);
-        nextQuestion();
+        updateQuestionView(quizHandler.startFrom(number));
     }
 
     @Override
@@ -281,6 +284,7 @@ public class GameActivity extends AppCompatActivity {
      */
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
+        // Hide the lifelines modal when user touches outside the view
         Rect viewRect = new Rect();
         cvLifelines.getGlobalVisibleRect(viewRect);
         if (!viewRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
@@ -292,17 +296,53 @@ public class GameActivity extends AppCompatActivity {
 
     // Called when one of the lifeline buttons is pressed
     public void handleLifelines(View view) {
-        switch(view.getId()) {
-            case R.id.btnFifty:
+        view.setEnabled(false);
+        switch (view.getId()) {
+            case R.id.btnFiftyfifty:
                 Log.d(LOG_TAG, "[LIFELINES] 50:50");
+                handleFiftyfifty();
                 break;
             case R.id.btnAudience:
                 Log.d(LOG_TAG, "[LIFELINES] Ask audience");
                 break;
             case R.id.btnSwitch:
                 Log.d(LOG_TAG, "[LIFELINES] Switch");
+                handleSwitchQuestion();
                 break;
         }
+    }
+
+    public void handleFiftyfifty() {
+        if (canUseLifeline[0]) {
+            Random rand = new Random();
+            int answer = quizHandler.currentQuestion().getAnswer();
+            Log.d(LOG_TAG, "[50:50] answer is " + answer);
+            int count = 0;
+            for (int i = 0; i < radGroup.getChildCount(); i++) {
+                while (true) {
+                    int randInt = rand.nextInt(4);
+                    // Make sure we don't eliminate the correct answer
+                    if (randInt != answer) {
+                        Log.d(LOG_TAG, "[50:50] Disable button: " + randInt);
+                        RadioButton radButton = (RadioButton) radGroup.getChildAt(randInt);
+                        // Make sure we don't repeat eliminating the same button
+                        if (radButton.isEnabled()) {
+                            radButton.setEnabled(false);
+                            break;
+                        }
+                    }
+                }
+                if (++count >= 2) break;
+            }
+            canUseLifeline[0] = false;
+        }
+    }
+
+    public void handleSwitchQuestion() {
+        if (canUseLifeline[2]) {
+            updateQuestionView(quizHandler.switchQuestion());
+        }
+        canUseLifeline[2] = false;
     }
 
 

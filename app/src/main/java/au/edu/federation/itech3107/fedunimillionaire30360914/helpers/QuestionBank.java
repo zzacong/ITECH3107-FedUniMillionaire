@@ -22,17 +22,17 @@ public class QuestionBank {
 
     public static final Map<Integer, int[]> QUESTION_VALUE_SAFE_MONEY_LIST = new HashMap<Integer, int[]>() {
         {
-            put(0, new int[]{0, 0});
-            put(1, new int[]{1000, 1000});
-            put(2, new int[]{2000, 1000});
-            put(3, new int[]{4000, 1000});
-            put(4, new int[]{8000, 1000});
-            put(5, new int[]{16000, 1000});
-            put(6, new int[]{32000, 32000});
-            put(7, new int[]{64000, 32000});
-            put(8, new int[]{125000, 32000});
-            put(9, new int[]{250000, 32000});
-            put(10, new int[]{500000, 32000});
+            put(0, new int[]{1000, 0});
+            put(1, new int[]{2000, 1000});
+            put(2, new int[]{4000, 1000});
+            put(3, new int[]{8000, 1000});
+            put(4, new int[]{16000, 1000});
+            put(5, new int[]{32000, 1000});
+            put(6, new int[]{64000, 32000});
+            put(7, new int[]{125000, 32000});
+            put(8, new int[]{250000, 32000});
+            put(9, new int[]{500000, 32000});
+            put(10, new int[]{1000000, 32000});
             put(11, new int[]{1000000, 1000000});
         }
     };
