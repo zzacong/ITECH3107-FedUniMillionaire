@@ -63,7 +63,7 @@ public class QuizHandler {
 
     public Question switchQuestion() {
         Log.d(LOG_TAG, "[QUIZ HANDLER] Current number: " + currentNumber);
-        Question currentQuestion = currentQuestion();
+        Question currentQuestion = questionList.get(currentNumber);
         Log.d(LOG_TAG, "[QUIZ HANDLER] Current question: " + currentQuestion.getTitle());
 
         Difficulty difficulty = currentQuestion.getDifficulty();
@@ -72,7 +72,7 @@ public class QuizHandler {
         while (true) {
             int randInt = rand.nextInt(questionList.size());
             Question newQuestion = questionList.get(randInt);
-            if (newQuestion.getTitle().compareToIgnoreCase(currentQuestion.getTitle()) != 0) {
+            if (!newQuestion.getTitle().equals(currentQuestion.getTitle())) {
                 Log.d(LOG_TAG, "[QUIZ HANDLER] New question: " + newQuestion.getTitle());
                 questionList.remove(currentNumber);
                 questionList.add(currentNumber, newQuestion);
