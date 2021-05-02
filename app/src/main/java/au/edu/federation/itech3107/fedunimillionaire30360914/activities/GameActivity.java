@@ -22,8 +22,10 @@ import androidx.cardview.widget.CardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -33,6 +35,7 @@ import au.edu.federation.itech3107.fedunimillionaire30360914.controllers.QuizHan
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank;
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.ScoreDataSource;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
+import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Difficulty;
 
 import static au.edu.federation.itech3107.fedunimillionaire30360914.activities.MainActivity.EXTRA_HOT_MODE;
 import static au.edu.federation.itech3107.fedunimillionaire30360914.activities.MainActivity.EXTRA_PLAYER_NAME;
@@ -56,20 +59,20 @@ public class GameActivity extends AppCompatActivity {
     private final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat(DATETIME_FORMAT);
 
 
-    private CardView cvLifelines;
-    private TextView tvDollarValue, tvSafeMoney, tvDifficulty, tvQuestionsLeft, tvQuestionNumber, tvQuestionTitle, tvTimer;
+    private CardView cvLifelines, cvPercents;
+    private TextView tvDollarValue, tvSafeMoney, tvDifficulty, tvQuestionsLeft, tvQuestionNumber, tvQuestionTitle, tvTimer, tvPercentA, tvPercentB, tvPercentC, tvPercentD;
     private RadioGroup radGroup;
     private RadioButton radA, radB, radC, radD;
     private Button btnSubmit, btnFiftyfifty, btnAudience, btnSwitch;
     private FloatingActionButton fabHelp;
+    private List<TextView> tvPercentList = new ArrayList<>();
 
     private QuizHandler quizHandler;
-
     private Handler handler;
     private Timer timer;
 
-    private boolean isHotMode;
     private String playerName;
+    private boolean isHotMode;
     private boolean canUseLifeline[] = {true, true, true};
 
 
@@ -81,6 +84,8 @@ public class GameActivity extends AppCompatActivity {
 
         // Link variables to screen components
         cvLifelines = findViewById(R.id.cvLifelines);
+        cvPercents = findViewById(R.id.cvPercents);
+
         tvDollarValue = findViewById(R.id.tvDollarValue);
         tvSafeMoney = findViewById(R.id.tvSafeMoney);
         tvDifficulty = findViewById(R.id.tvDfficulty);
@@ -88,15 +93,19 @@ public class GameActivity extends AppCompatActivity {
         tvQuestionNumber = findViewById(R.id.tvQuestionNumber);
         tvQuestionTitle = findViewById(R.id.tvQuestionTitle);
         tvTimer = findViewById(R.id.tvTimer);
+
+        tvPercentList.add(findViewById(R.id.tvPercentA));
+        tvPercentList.add(findViewById(R.id.tvPercentB));
+        tvPercentList.add(findViewById(R.id.tvPercentC));
+        tvPercentList.add(findViewById(R.id.tvPercentD));
+
         radGroup = findViewById(R.id.radGroup);
         radA = findViewById(R.id.radA);
         radB = findViewById(R.id.radB);
         radC = findViewById(R.id.radC);
         radD = findViewById(R.id.radD);
+
         btnSubmit = findViewById(R.id.btnSubmit);
-//        btnFiftyfifty = findViewById(R.id.btnFiftyfifty);
-//        btnAudience = findViewById(R.id.btnAudience);
-//        btnSwitch = findViewById(R.id.btnSwitch);
         fabHelp = findViewById(R.id.fabHelp);
 
         // Get intent extra passed from MainActivity
@@ -143,6 +152,9 @@ public class GameActivity extends AppCompatActivity {
 
     // Display current question dollar value, safe money amount and show the questions and choices
     private void updateQuestionView(Question question) {
+        // Hide the percentages CardView if it is visible
+        if (cvPercents.getVisibility() == View.VISIBLE) cvPercents.setVisibility(View.INVISIBLE);
+
         if (question != null) {
             radGroup.clearCheck();
             tvQuestionTitle.setText(question.getTitle());
@@ -304,6 +316,7 @@ public class GameActivity extends AppCompatActivity {
                 break;
             case R.id.btnAudience:
                 Log.d(LOG_TAG, "[LIFELINES] Ask audience");
+                handleAskAudience();
                 break;
             case R.id.btnSwitch:
                 Log.d(LOG_TAG, "[LIFELINES] Switch");
@@ -335,6 +348,97 @@ public class GameActivity extends AppCompatActivity {
                 if (++count >= 2) break;
             }
             canUseLifeline[0] = false;
+        }
+    }
+
+    public int genRandIntInRange(int min, int max) {
+        Log.d(LOG_TAG, "min: " + min + " , max: " + max);
+        Random rand = new Random();
+        return rand.nextInt(max - min) + min;
+    }
+
+    public List<Integer> percentage(Difficulty difficulty) {
+        List<Integer> list = new ArrayList<>();
+        int sum = 0;
+
+        switch (difficulty) {
+            case easy:
+                Log.d(LOG_TAG, "[ASK AUDIENCE] easy");
+                for (int i = 0; i < 3; i++) {
+                    int num = genRandIntInRange(1, 6);
+                    sum += num;
+                    list.add(num);
+                }
+                int lastInt = 100 - sum;
+                list.add(lastInt);
+                break;
+            case medium:
+                Log.d(LOG_TAG, "[ASK AUDIENCE] medium");
+                int max = 0;
+                for (int i = 0; i < 4; i++) {
+                    int num;
+                    if (i < 2) {
+                        num = genRandIntInRange(40, 50);
+                        // If the second random number is the same as the first, re-run the method
+                        if (num == max) return percentage(difficulty);
+                    } else {
+                        int left = 100 - sum;
+                        // On last iteration, take whatever's left until 100
+                        if (i >= 3) num = 100 - sum;
+                        else num = genRandIntInRange(1, left - 1);
+                    }
+                    sum += num;
+                    // Put the largest number at the end of the list
+                    if (num > max) {
+                        max = num;
+                        list.add(num);
+                        continue;
+                    }
+                    list.add(0, num);
+                }
+                break;
+            case hard:
+                Log.d(LOG_TAG, "[ASK AUDIENCE] hard");
+                for (int i = 0; i < 4; i++) {
+                    int num;
+                    if (i < 2) {
+                        num = genRandIntInRange(30, 33);
+                        list.add(num);
+                    } else {
+                        int left = 100 - sum;
+                        // On last iteration, take whatever's left until 100
+                        if (i >= 3) num = 100 - sum;
+                        else num = genRandIntInRange(1, left - 1);
+                        list.add(0, num);
+                    }
+                    sum += num;
+                }
+                break;
+        }
+
+        return list;
+    }
+
+    public void handleAskAudience() {
+        // Show the percentages CardView
+        cvPercents.setVisibility(View.VISIBLE);
+
+        // Hide the lifelines buttons CardView
+        cvLifelines.setVisibility(View.INVISIBLE);
+        fabHelp.setVisibility(View.VISIBLE);
+
+        Question question = quizHandler.currentQuestion();
+        List<Integer> percentage = percentage(question.getDifficulty());
+
+        Log.d(LOG_TAG, "Percentage size: " + percentage.size());
+        for (int i = 0; i < tvPercentList.size(); i++) {
+            if (i == question.getAnswer()) {
+                // The last element in integerList is the percentage for the correct answer
+                tvPercentList.get(i).setText(percentage.get(percentage.size() - 1).toString());
+            } else {
+                tvPercentList.get(i).setText(percentage.get(0).toString());
+                percentage.remove(0);
+            }
         }
     }
 

@@ -127,11 +127,12 @@
     </TableLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="24dp"
-        app:layout_constraintBottom_toTopOf="@+id/cardView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tableLayout">
@@ -184,8 +185,7 @@
         app:layout_constraintBottom_toTopOf="@+id/btnSubmit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tableLayout"
-        app:layout_constraintVertical_bias="0.6">
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -305,8 +305,178 @@
         android:text="@string/submit"
         app:layout_constraintBottom_toTopOf="@+id/fabHelp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnSubmit">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvPercents"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="88dp"
+            android:visibility="invisible"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="12dp"
+            tools:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tvPercentLabelA"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/a"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/tvPercentA"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="@string/placeholder_num"
+                        app:layout_constraintStart_toEndOf="@+id/tvPercentLabelA"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/tvPercentLabelB"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="64dp"
+                        android:text="@string/b"
+                        app:layout_constraintStart_toEndOf="@+id/tvPercentA"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/tvPercentB"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="@string/placeholder_num"
+                        app:layout_constraintStart_toEndOf="@+id/tvPercentLabelB"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/tvPercentLabelC"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/c"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tvPercentLabelA" />
+
+                    <TextView
+                        android:id="@+id/tvPercentC"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/placeholder_num"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/tvPercentLabelC"
+                        app:layout_constraintTop_toBottomOf="@id/tvPercentA" />
+
+                    <TextView
+                        android:id="@+id/tvPercentLabelD"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="64dp"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/d"
+                        app:layout_constraintStart_toEndOf="@+id/tvPercentC"
+                        app:layout_constraintTop_toBottomOf="@id/tvPercentLabelB" />
+
+                    <TextView
+                        android:id="@+id/tvPercentD"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/placeholder_num"
+                        app:layout_constraintStart_toEndOf="@+id/tvPercentLabelD"
+                        app:layout_constraintTop_toBottomOf="@id/tvPercentB" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvLifelines"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:backgroundTint="@color/white"
+            android:visibility="invisible"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="12dp"
+            tools:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="8dp">
+
+                <Button
+                    android:id="@+id/btnFiftyfifty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="6dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="@drawable/btn_blue"
+                    android:minWidth="40dp"
+                    android:onClick="handleLifelines"
+                    android:paddingHorizontal="4dp"
+                    android:text="@string/_50_50"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/btnAudience"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="6dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="@drawable/btn_blue"
+                    android:minWidth="40dp"
+                    android:onClick="handleLifelines"
+                    android:paddingHorizontal="4dp"
+                    android:text="@string/ask_audience"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/btnSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="6dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="@drawable/btn_blue"
+                    android:minWidth="40dp"
+                    android:onClick="handleLifelines"
+                    android:paddingHorizontal="4dp"
+                    android:text="@string/switch_"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+    </FrameLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabHelp"
@@ -323,71 +493,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/quiz_hint"
         app:tint="@color/white" />
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cvLifelines"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:backgroundTint="@color/white"
-        android:visibility="invisible"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="10dp"
-        app:cardMaxElevation="12dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnSubmit">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:paddingHorizontal="6dp"
-            android:paddingVertical="8dp">
-
-            <Button
-                android:id="@+id/btnFiftyfifty"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="6dp"
-                android:layout_weight="1"
-                android:backgroundTint="@drawable/btn_blue"
-                android:minWidth="40dp"
-                android:onClick="handleLifelines"
-                android:paddingHorizontal="4dp"
-                android:text="@string/_50_50"
-                android:textSize="12sp" />
-
-            <Button
-                android:id="@+id/btnAudience"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="6dp"
-                android:layout_weight="1"
-                android:backgroundTint="@drawable/btn_blue"
-                android:minWidth="40dp"
-                android:onClick="handleLifelines"
-                android:paddingHorizontal="4dp"
-                android:text="@string/ask_audience"
-                android:textSize="12sp" />
-
-            <Button
-                android:id="@+id/btnSwitch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="6dp"
-                android:layout_weight="1"
-                android:backgroundTint="@drawable/btn_blue"
-                android:minWidth="40dp"
-                android:onClick="handleLifelines"
-                android:paddingHorizontal="4dp"
-                android:text="@string/switch_"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

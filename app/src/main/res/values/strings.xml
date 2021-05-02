@@ -48,6 +48,7 @@
     <string name="_50_50">50:50</string>
     <string name="ask_audience">Ask audience</string>
     <string name="switch_">Switch</string>
+    <string name="placeholder_num">##</string>
 
     <string-array name="difficulty_array">
         <item>easy</item>
