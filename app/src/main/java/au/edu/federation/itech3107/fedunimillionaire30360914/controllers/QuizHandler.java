@@ -1,53 +1,83 @@
 package au.edu.federation.itech3107.fedunimillionaire30360914.controllers;
 
+import android.util.Log;
+
 import java.util.List;
+import java.util.Random;
 
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
+import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Difficulty;
 
 import static au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank.QUESTION_VALUE_SAFE_MONEY_LIST;
 
 public class QuizHandler {
 
+    private static final String LOG_TAG = QuizHandler.class.getSimpleName();
     private final int MAX = 11;
     private final List<Question> questionList;
+    private QuestionBank questionBank;
     private Integer currentNumber = 0;
-    private Integer questionsLeft = MAX - currentNumber;
 
 
     public QuizHandler(QuestionBank questionBank) {
+        this.questionBank = questionBank;
         this.questionList = questionBank.getQuizQuestions();
     }
 
     public Integer getCurrentNumber() {
-        return currentNumber;
-    }
-
-    public Question startFrom(int number) {
-        if (number <= 0) this.currentNumber = 0;
-        else this.currentNumber = number - 1;
-        return nextQuestion();
+        return currentNumber + 1;
     }
 
     public Integer getQuestionsLeft() {
-        return questionsLeft;
+        return MAX - (currentNumber + 1);
+    }
+
+    public Question startFrom(int number) {
+        currentNumber = Math.max(number - 1, 0);
+        return getQuestionAt(currentNumber);
     }
 
     public Question nextQuestion() {
-        this.currentNumber++;
-        if (this.currentNumber <= questionList.size()) {
-            this.questionsLeft = MAX - this.currentNumber;
-            return questionList.get(this.currentNumber - 1);
+        return getQuestionAt(++currentNumber);
+    }
+
+    public Question currentQuestion() {
+        return getQuestionAt(currentNumber);
+    }
+
+    private Question getQuestionAt(int index) {
+        if (index < questionList.size()) {
+            return questionList.get(index);
         }
         return null;
     }
 
     public Integer getSafeMoneyValue() {
-        int number = this.currentNumber - 1;
-        return QUESTION_VALUE_SAFE_MONEY_LIST.get(number)[1];
+        return QUESTION_VALUE_SAFE_MONEY_LIST.get(currentNumber)[1];
     }
 
     public Integer getQuestionValue() {
         return QUESTION_VALUE_SAFE_MONEY_LIST.get(currentNumber)[0];
+    }
+
+    public Question switchQuestion() {
+        Log.d(LOG_TAG, "[QUIZ HANDLER] Current number: " + currentNumber);
+        Question currentQuestion = questionList.get(currentNumber);
+        Log.d(LOG_TAG, "[QUIZ HANDLER] Current question: " + currentQuestion.getTitle());
+
+        Difficulty difficulty = currentQuestion.getDifficulty();
+        List<Question> questionList = questionBank.getQuestions(difficulty);
+        Random rand = new Random();
+        while (true) {
+            int randInt = rand.nextInt(questionList.size());
+            Question newQuestion = questionList.get(randInt);
+            if (!newQuestion.getTitle().equals(currentQuestion.getTitle())) {
+                Log.d(LOG_TAG, "[QUIZ HANDLER] New question: " + newQuestion.getTitle());
+                questionList.remove(currentNumber);
+                questionList.add(currentNumber, newQuestion);
+                return newQuestion;
+            }
+        }
     }
 }

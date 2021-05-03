@@ -21,14 +21,14 @@
         android:id="@+id/lyHeader"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="64dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginEnd="16dp"
         android:background="@color/teal_700"
         android:baselineAligned="false"
         android:gravity="center_vertical"
-        android:paddingVertical="4dp"
         android:paddingHorizontal="6dp"
+        android:paddingVertical="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView">
@@ -85,7 +85,6 @@
                 android:layout_height="wrap_content"
                 android:drawablePadding="6dp"
                 android:text="@string/date_time"
-
                 android:textAlignment="center"
                 android:textColor="@color/white" />
         </LinearLayout>
@@ -115,9 +114,9 @@
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="16dp"
         android:backgroundTint="@android:color/holo_red_dark"
+        android:onClick="deleteScores"
         android:text="@string/delete"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:onClick="deleteScores"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

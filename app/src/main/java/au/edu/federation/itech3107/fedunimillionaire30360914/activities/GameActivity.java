@@ -1,10 +1,14 @@
 package au.edu.federation.itech3107.fedunimillionaire30360914.activities;
 
+import android.animation.Animator;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -13,10 +17,16 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -25,6 +35,7 @@ import au.edu.federation.itech3107.fedunimillionaire30360914.controllers.QuizHan
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank;
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.ScoreDataSource;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
+import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Difficulty;
 
 import static au.edu.federation.itech3107.fedunimillionaire30360914.activities.MainActivity.EXTRA_HOT_MODE;
 import static au.edu.federation.itech3107.fedunimillionaire30360914.activities.MainActivity.EXTRA_PLAYER_NAME;
@@ -48,19 +59,21 @@ public class GameActivity extends AppCompatActivity {
     private final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat(DATETIME_FORMAT);
 
 
-    private TextView tvDollarValue, tvSafeMoney, tvDifficulty, tvQuestionsLeft, tvQuestionNumber, tvQuestionTitle, tvTimer;
+    private CardView cvLifelines, cvPercents;
+    private TextView tvDollarValue, tvSafeMoney, tvDifficulty, tvQuestionsLeft, tvQuestionNumber, tvQuestionTitle, tvTimer, tvPercentA, tvPercentB, tvPercentC, tvPercentD;
     private RadioGroup radGroup;
     private RadioButton radA, radB, radC, radD;
-    private Button btnSubmit;
+    private Button btnSubmit, btnFiftyfifty, btnAudience, btnSwitch;
+    private FloatingActionButton fabHelp;
+    private List<TextView> tvPercentList = new ArrayList<>();
 
     private QuizHandler quizHandler;
-    private Question question;
-
     private Handler handler;
     private Timer timer;
 
-    private boolean isHotMode;
     private String playerName;
+    private boolean isHotMode;
+    private boolean canUseLifeline[] = {true, true, true};
 
 
     @Override
@@ -70,6 +83,9 @@ public class GameActivity extends AppCompatActivity {
         Log.d(LOG_TAG, "[ON_CREATE]");
 
         // Link variables to screen components
+        cvLifelines = findViewById(R.id.cvLifelines);
+        cvPercents = findViewById(R.id.cvPercents);
+
         tvDollarValue = findViewById(R.id.tvDollarValue);
         tvSafeMoney = findViewById(R.id.tvSafeMoney);
         tvDifficulty = findViewById(R.id.tvDfficulty);
@@ -77,12 +93,20 @@ public class GameActivity extends AppCompatActivity {
         tvQuestionNumber = findViewById(R.id.tvQuestionNumber);
         tvQuestionTitle = findViewById(R.id.tvQuestionTitle);
         tvTimer = findViewById(R.id.tvTimer);
+
+        tvPercentList.add(findViewById(R.id.tvPercentA));
+        tvPercentList.add(findViewById(R.id.tvPercentB));
+        tvPercentList.add(findViewById(R.id.tvPercentC));
+        tvPercentList.add(findViewById(R.id.tvPercentD));
+
         radGroup = findViewById(R.id.radGroup);
         radA = findViewById(R.id.radA);
         radB = findViewById(R.id.radB);
         radC = findViewById(R.id.radC);
         radD = findViewById(R.id.radD);
+
         btnSubmit = findViewById(R.id.btnSubmit);
+        fabHelp = findViewById(R.id.fabHelp);
 
         // Get intent extra passed from MainActivity
         Intent intent = getIntent();
@@ -97,8 +121,7 @@ public class GameActivity extends AppCompatActivity {
 
         // Instantiate a new QuizHandler to manage the quiz questions
         quizHandler = new QuizHandler(new QuestionBank(this));
-        this.question = quizHandler.startFrom(0);
-        nextQuestion();
+        updateQuestionView(quizHandler.startFrom(1));
     }
 
     // Called when users press submit button
@@ -114,10 +137,9 @@ public class GameActivity extends AppCompatActivity {
             int selectedIndex = radGroup.indexOfChild(findViewById(selectedRadId));
 
             // Check player has selected the correct answer;
-            if (question.attempt(selectedIndex)) {
+            if (quizHandler.currentQuestion().attempt(selectedIndex)) {
                 Log.d(LOG_TAG, "[CORRECT]");
-                this.question = quizHandler.nextQuestion();
-                nextQuestion();
+                updateQuestionView(quizHandler.nextQuestion());
             } else {
                 Log.d(LOG_TAG, "[WRONG] Current question: " + quizHandler.getCurrentNumber());
                 endGame(false);
@@ -129,14 +151,19 @@ public class GameActivity extends AppCompatActivity {
     }
 
     // Display current question dollar value, safe money amount and show the questions and choices
-    private void nextQuestion() {
+    private void updateQuestionView(Question question) {
+        // Hide the percentages CardView if it is visible
+        if (cvPercents.getVisibility() == View.VISIBLE) cvPercents.setVisibility(View.INVISIBLE);
+
         if (question != null) {
             radGroup.clearCheck();
             tvQuestionTitle.setText(question.getTitle());
-            radA.setText(question.getChoices().get(0));
-            radB.setText(question.getChoices().get(1));
-            radC.setText(question.getChoices().get(2));
-            radD.setText(question.getChoices().get(3));
+
+            for (int i = 0; i < 4; i++) {
+                RadioButton radButton = (RadioButton) radGroup.getChildAt(i);
+                radButton.setEnabled(true);
+                radButton.setText(question.getChoices().get(i));
+            }
 
             Integer currentNumber = quizHandler.getCurrentNumber();
             tvDollarValue.setText(quizHandler.getQuestionValue().toString());
@@ -197,8 +224,7 @@ public class GameActivity extends AppCompatActivity {
         super.onRestoreInstanceState(savedInstanceState);
         int number = savedInstanceState.getInt(OUTSTATE_QUESTION_NO);
         Log.d(LOG_TAG, "[RESTORING STATE] Current question: " + number);
-        this.question = quizHandler.startFrom(number);
-        nextQuestion();
+        updateQuestionView(quizHandler.startFrom(number));
     }
 
     @Override
@@ -244,6 +270,189 @@ public class GameActivity extends AppCompatActivity {
         }
     };
 
+    // Called when user press the lifelines button on the bottom right of screen
+    public void callLifeLines(View view) {
+        view.setVisibility(View.INVISIBLE);
+        circularRevealCard(cvLifelines);
+    }
+
+    /**
+     * reference: https://stackoverflow.com/a/42114635
+     */
+    // Animator function
+    private void circularRevealCard(View view) {
+        float finalRadius = Math.max(view.getWidth(), view.getHeight());
+        // create the animator which display the card view
+        // in a circular motion that starts from right
+        Animator circularReveal = ViewAnimationUtils.createCircularReveal(view, view.getWidth(), 0, 0, finalRadius * 1.1f);
+        circularReveal.setDuration(500);
+        // make the view visible and start the animation
+        view.setVisibility(View.VISIBLE);
+        circularReveal.start();
+    }
+
+    /**
+     * reference: https://stackoverflow.com/a/32105890
+     */
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        // Hide the lifelines modal when user touches outside the view
+        Rect viewRect = new Rect();
+        cvLifelines.getGlobalVisibleRect(viewRect);
+        if (!viewRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
+            cvLifelines.setVisibility(View.INVISIBLE);
+            fabHelp.setVisibility(View.VISIBLE);
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
+    // Called when one of the lifeline buttons is pressed
+    public void handleLifelines(View view) {
+        view.setEnabled(false);
+        switch (view.getId()) {
+            case R.id.btnFiftyfifty:
+                Log.d(LOG_TAG, "[LIFELINES] 50:50");
+                handleFiftyfifty();
+                break;
+            case R.id.btnAudience:
+                Log.d(LOG_TAG, "[LIFELINES] Ask audience");
+                handleAskAudience();
+                break;
+            case R.id.btnSwitch:
+                Log.d(LOG_TAG, "[LIFELINES] Switch");
+                handleSwitchQuestion();
+                break;
+        }
+    }
+
+    public void handleFiftyfifty() {
+        if (canUseLifeline[0]) {
+            Random rand = new Random();
+            int answer = quizHandler.currentQuestion().getAnswer();
+            Log.d(LOG_TAG, "[50:50] answer is " + answer);
+            int count = 0;
+            for (int i = 0; i < radGroup.getChildCount(); i++) {
+                while (true) {
+                    int randInt = rand.nextInt(4);
+                    // Make sure we don't eliminate the correct answer
+                    if (randInt != answer) {
+                        Log.d(LOG_TAG, "[50:50] Disable button: " + randInt);
+                        RadioButton radButton = (RadioButton) radGroup.getChildAt(randInt);
+                        // Make sure we don't repeat eliminating the same button
+                        if (radButton.isEnabled()) {
+                            radButton.setEnabled(false);
+                            break;
+                        }
+                    }
+                }
+                if (++count >= 2) break;
+            }
+            canUseLifeline[0] = false;
+        }
+    }
+
+    public int genRandIntInRange(int min, int max) {
+        Log.d(LOG_TAG, "min: " + min + " , max: " + max);
+        Random rand = new Random();
+        return rand.nextInt(max - min) + min;
+    }
+
+    public List<Integer> percentage(Difficulty difficulty) {
+        List<Integer> list = new ArrayList<>();
+        int sum = 0;
+
+        switch (difficulty) {
+            case easy:
+                Log.d(LOG_TAG, "[ASK AUDIENCE] easy");
+                for (int i = 0; i < 3; i++) {
+                    int num = genRandIntInRange(1, 6);
+                    sum += num;
+                    list.add(num);
+                }
+                int lastInt = 100 - sum;
+                list.add(lastInt);
+                break;
+            case medium:
+                Log.d(LOG_TAG, "[ASK AUDIENCE] medium");
+                int max = 0;
+                for (int i = 0; i < 4; i++) {
+                    int num;
+                    if (i < 2) {
+                        num = genRandIntInRange(40, 50);
+                        // If the second random number is the same as the first, re-run the method
+                        if (num == max) return percentage(difficulty);
+                    } else {
+                        int left = 100 - sum;
+                        // On last iteration, take whatever's left until 100
+                        if (i >= 3) num = 100 - sum;
+                        else num = genRandIntInRange(1, left - 1);
+                    }
+                    sum += num;
+                    // Put the largest number at the end of the list
+                    if (num > max) {
+                        max = num;
+                        list.add(num);
+                        continue;
+                    }
+                    list.add(0, num);
+                }
+                break;
+            case hard:
+                Log.d(LOG_TAG, "[ASK AUDIENCE] hard");
+                for (int i = 0; i < 4; i++) {
+                    int num;
+                    if (i < 2) {
+                        num = genRandIntInRange(30, 33);
+                        list.add(num);
+                    } else {
+                        int left = 100 - sum;
+                        // On last iteration, take whatever's left until 100
+                        if (i >= 3) num = 100 - sum;
+                        else num = genRandIntInRange(1, left - 1);
+                        list.add(0, num);
+                    }
+                    sum += num;
+                }
+                break;
+        }
+
+        return list;
+    }
+
+    public void handleAskAudience() {
+        // Show the percentages CardView
+        cvPercents.setVisibility(View.VISIBLE);
+
+        // Hide the lifelines buttons CardView
+        cvLifelines.setVisibility(View.INVISIBLE);
+        fabHelp.setVisibility(View.VISIBLE);
+
+        Question question = quizHandler.currentQuestion();
+        List<Integer> percentage = percentage(question.getDifficulty());
+
+        Log.d(LOG_TAG, "Percentage size: " + percentage.size());
+        for (int i = 0; i < tvPercentList.size(); i++) {
+            if (i == question.getAnswer()) {
+                // The last element in integerList is the percentage for the correct answer
+                tvPercentList.get(i).setText(percentage.get(percentage.size() - 1).toString());
+            } else {
+                tvPercentList.get(i).setText(percentage.get(0).toString());
+                percentage.remove(0);
+            }
+        }
+    }
+
+    public void handleSwitchQuestion() {
+        if (canUseLifeline[2]) {
+            updateQuestionView(quizHandler.switchQuestion());
+        }
+        canUseLifeline[2] = false;
+    }
+
+
+    /**
+     * Private classes
+     */
     private class DisplaySecondsTask extends TimerTask {
         int seconds;
 
