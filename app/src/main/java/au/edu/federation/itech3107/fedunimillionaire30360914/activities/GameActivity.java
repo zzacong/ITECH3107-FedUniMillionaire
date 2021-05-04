@@ -64,8 +64,7 @@ public class GameActivity extends AppCompatActivity {
     private CardView cvLifelines, cvPercents;
     private TextView tvDollarValue, tvSafeMoney, tvDifficulty, tvQuestionsLeft, tvQuestionNumber, tvQuestionTitle, tvTimer, tvPercentA, tvPercentB, tvPercentC, tvPercentD;
     private RadioGroup radGroup;
-    private RadioButton radA, radB, radC, radD;
-    private Button btnSubmit, btnFiftyfifty, btnAudience, btnSwitch;
+    private Button btnSubmit;
     private FloatingActionButton fabHelp;
     private List<TextView> tvPercentList = new ArrayList<>();
 
@@ -102,10 +101,6 @@ public class GameActivity extends AppCompatActivity {
         tvPercentList.add(findViewById(R.id.tvPercentD));
 
         radGroup = findViewById(R.id.radGroup);
-        radA = findViewById(R.id.radA);
-        radB = findViewById(R.id.radB);
-        radC = findViewById(R.id.radC);
-        radD = findViewById(R.id.radD);
 
         btnSubmit = findViewById(R.id.btnSubmit);
         fabHelp = findViewById(R.id.fabHelp);
