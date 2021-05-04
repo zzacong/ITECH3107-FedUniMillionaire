@@ -32,6 +32,8 @@ import java.util.TimerTask;
 
 import au.edu.federation.itech3107.fedunimillionaire30360914.R;
 import au.edu.federation.itech3107.fedunimillionaire30360914.controllers.QuizHandler;
+import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.CheckInternet;
+import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.IQuestionReadyCallback;
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank;
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.ScoreDataSource;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
@@ -119,9 +121,22 @@ public class GameActivity extends AppCompatActivity {
             handler = new Handler();
         }
 
-        // Instantiate a new QuizHandler to manage the quiz questions
-        quizHandler = new QuizHandler(new QuestionBank(this));
-        updateQuestionView(quizHandler.startFrom(1));
+        CheckInternet checkInternet = new CheckInternet(this);
+        if (checkInternet.isNetworkConnected()) {
+            IQuestionReadyCallback mCallback = () -> {
+                quizHandler.loadQuestions();
+                updateQuestionView(quizHandler.startFrom(1));
+            };
+            // Instantiate a new QuizHandler to manage the quiz questions
+            quizHandler = new QuizHandler(new QuestionBank(this, mCallback));
+
+        } else {
+            quizHandler = new QuizHandler((new QuestionBank(this)));
+            quizHandler.loadQuestions();
+            updateQuestionView(quizHandler.startFrom(1));
+        }
+
+
     }
 
     // Called when users press submit button

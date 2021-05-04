@@ -15,14 +15,18 @@ public class QuizHandler {
 
     private static final String LOG_TAG = QuizHandler.class.getSimpleName();
     private final int MAX = 11;
-    private final List<Question> questionList;
+    private List<Question> quizQuestions;
     private QuestionBank questionBank;
     private Integer currentNumber = 0;
 
 
     public QuizHandler(QuestionBank questionBank) {
         this.questionBank = questionBank;
-        this.questionList = questionBank.getQuizQuestions();
+//        this.questionList = questionBank.getQuizQuestions();
+    }
+
+    public void loadQuestions() {
+        quizQuestions = questionBank.getQuizQuestions();
     }
 
     public Integer getCurrentNumber() {
@@ -47,8 +51,8 @@ public class QuizHandler {
     }
 
     private Question getQuestionAt(int index) {
-        if (index < questionList.size()) {
-            return questionList.get(index);
+        if (index < quizQuestions.size()) {
+            return quizQuestions.get(index);
         }
         return null;
     }
@@ -63,7 +67,7 @@ public class QuizHandler {
 
     public Question switchQuestion() {
         Log.d(LOG_TAG, "[QUIZ HANDLER] Current number: " + currentNumber);
-        Question currentQuestion = questionList.get(currentNumber);
+        Question currentQuestion = quizQuestions.get(currentNumber);
         Log.d(LOG_TAG, "[QUIZ HANDLER] Current question: " + currentQuestion.getTitle());
 
         Difficulty difficulty = currentQuestion.getDifficulty();

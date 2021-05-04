@@ -1,6 +1,9 @@
 package au.edu.federation.itech3107.fedunimillionaire30360914.helpers;
 
 import android.content.Context;
+import android.util.Log;
+
+import com.android.volley.VolleyError;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,14 +42,44 @@ public class QuestionBank {
 
     private static final String LOG_TAG = QuestionBank.class.getSimpleName();
 
-    private Map<Difficulty, List<Question>> questionsMap = new HashMap<>();;
+    private Map<Difficulty, List<Question>> questionsMap = new HashMap<>();
+    ;
     private QuestionOpenHelper questionOpenHelper;
-
+    private QuestionAPIHelper questionAPIHelper;
 
     public QuestionBank(Context context) {
         this.questionOpenHelper = new QuestionOpenHelper(context);
-        updateQuestion();
+        loadQuestionsFromFiles();
     }
+
+    public QuestionBank(Context context, IQuestionReadyCallback callback) {
+        loadQuestionsFromInternet(context, callback);
+    }
+
+    public void loadQuestionsFromInternet(Context context, IQuestionReadyCallback callback) {
+        Log.d(LOG_TAG, "[QUESTION BANK] Loading question from internet");
+        IQuestionAPICallback mCallback = new IQuestionAPICallback() {
+            @Override
+            public void notifySuccess(Difficulty difficulty, List<Question> questionList) {
+                questionList.forEach(question -> Log.d(LOG_TAG, question.toString()));
+                questionsMap.put(difficulty, questionList);
+                if (questionsMap.size() >= 3)
+                    callback.notifySuccess();
+            }
+
+            @Override
+            public void notifyError(VolleyError error) {
+                Log.d(LOG_TAG, "Volley JSON post" + "That didn't work!");
+            }
+        };
+
+        this.questionAPIHelper = new QuestionAPIHelper(context, mCallback);
+        questionAPIHelper.fetchQuestions(easy, 10);
+        questionAPIHelper.fetchQuestions(medium, 10);
+        questionAPIHelper.fetchQuestions(hard, 10);
+
+    }
+
 
     public List<Question> getQuizQuestions() {
         List<Question> questionList = new ArrayList<>();
@@ -74,7 +107,8 @@ public class QuestionBank {
         return questionsMap.get(difficulty);
     }
 
-    public void updateQuestion() {
+    public void loadQuestionsFromFiles() {
+        Log.d(LOG_TAG, "[QUESTION BANK] Loading question from files");
         questionsMap.put(easy, questionOpenHelper.readQuestionsFromFile(EASY_QUESTIONS_FILENAME));
         questionsMap.put(medium, questionOpenHelper.readQuestionsFromFile(MEDIUM_QUESTIONS_FILENAME));
         questionsMap.put(hard, questionOpenHelper.readQuestionsFromFile(HARD_QUESTIONS_FILENAME));
@@ -96,7 +130,7 @@ public class QuestionBank {
 
         if (questionOpenHelper.addQuestionToFile(fileName, question)) {
             // New question successfully added, now update memory of question list
-            updateQuestion();
+            loadQuestionsFromFiles();
             return true;
         }
         return false;
@@ -118,7 +152,7 @@ public class QuestionBank {
 
         if (questionOpenHelper.writeQuestionsToFile(fileName, questionsList)) {
             // Questions overridden successfully, now update memory of question list
-            updateQuestion();
+            loadQuestionsFromFiles();
             return true;
         }
         return false;
