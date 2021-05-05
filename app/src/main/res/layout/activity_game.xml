@@ -301,6 +301,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="8dp"
+        android:enabled="false"
         android:onClick="handleSubmit"
         android:text="@string/submit"
         app:layout_constraintBottom_toTopOf="@+id/fabHelp"

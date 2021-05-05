@@ -22,7 +22,6 @@ public class QuizHandler {
 
     public QuizHandler(QuestionBank questionBank) {
         this.questionBank = questionBank;
-//        this.questionList = questionBank.getQuizQuestions();
     }
 
     public void loadQuestions() {
@@ -68,7 +67,7 @@ public class QuizHandler {
     public Question switchQuestion() {
         Log.d(LOG_TAG, "[QUIZ HANDLER] Current number: " + currentNumber);
         Question currentQuestion = quizQuestions.get(currentNumber);
-        Log.d(LOG_TAG, "[QUIZ HANDLER] Current question: " + currentQuestion.getTitle());
+        Log.d(LOG_TAG, "[QUIZ HANDLER] Current question: " + currentQuestion.toString());
 
         Difficulty difficulty = currentQuestion.getDifficulty();
         List<Question> questionList = questionBank.getQuestions(difficulty);
@@ -77,7 +76,7 @@ public class QuizHandler {
             int randInt = rand.nextInt(questionList.size());
             Question newQuestion = questionList.get(randInt);
             if (!newQuestion.getTitle().equals(currentQuestion.getTitle())) {
-                Log.d(LOG_TAG, "[QUIZ HANDLER] New question: " + newQuestion.getTitle());
+                Log.d(LOG_TAG, "[QUIZ HANDLER] New question: " + newQuestion.toString());
                 questionList.remove(currentNumber);
                 questionList.add(currentNumber, newQuestion);
                 return newQuestion;

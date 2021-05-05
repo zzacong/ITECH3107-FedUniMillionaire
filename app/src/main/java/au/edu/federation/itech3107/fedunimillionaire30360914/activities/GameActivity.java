@@ -188,6 +188,8 @@ public class GameActivity extends AppCompatActivity {
                 Integer sec = (int) HOT_MODE_TIME / 1000;
                 tvTimer.setText(sec.toString());
             }
+
+            btnSubmit.setEnabled(true);
         } else {
             // If there's no more questions, disable the submit button and ends the game
             Log.d(LOG_TAG, "[DONE] No more questions");
