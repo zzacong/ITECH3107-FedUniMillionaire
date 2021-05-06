@@ -27,26 +27,26 @@ public class QuestionAPIHelper {
     private static final String QUERY_PARAMS = "?category=9&type=multiple";
 
     private Context context;
-    private IQuestionAPICallback mCallback;
+    private OnQuestionsFetched listener;
+    RequestQueue queue;
 
-    public QuestionAPIHelper(Context context, IQuestionAPICallback callback) {
+    public QuestionAPIHelper(Context context, OnQuestionsFetched listener) {
         this.context = context;
-        this.mCallback = callback;
+        this.listener = listener;
+        this.queue = Volley.newRequestQueue(context);
     }
 
     public void fetchQuestions(Difficulty difficulty, int amount) {
-        // Instantiate the RequestQueue.
-        RequestQueue queue = Volley.newRequestQueue(context);
         String url = buildUrl(difficulty, amount);
-
+        Log.d(LOG_TAG, "[VOLLEY] Send request to " + url);
         // Request a string response from the provided URL
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 response -> {
-                    mCallback.notifySuccess(difficulty, toQuestionList(response));
+                    listener.onSuccess(difficulty, toQuestionList(response));
                 },
                 error -> {
                     Log.d(LOG_TAG, "[VOLLEY] Error: \n" + error);
-                    mCallback.notifyError(error);
+                    listener.onError(error);
                 });
 
         // Add the request to the RequestQueue.

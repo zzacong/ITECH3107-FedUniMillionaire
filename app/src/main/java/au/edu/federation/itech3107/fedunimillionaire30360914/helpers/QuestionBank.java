@@ -21,7 +21,7 @@ import static au.edu.federation.itech3107.fedunimillionaire30360914.models.Quest
 import static au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Difficulty.hard;
 import static au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Difficulty.medium;
 
-public class QuestionBank {
+public class QuestionBank implements OnQuestionsFetched {
 
     public static final Map<Integer, int[]> QUESTION_VALUE_SAFE_MONEY_LIST = new HashMap<Integer, int[]>() {
         {
@@ -46,40 +46,45 @@ public class QuestionBank {
     ;
     private QuestionOpenHelper questionOpenHelper;
     private QuestionAPIHelper questionAPIHelper;
+    private OnQuestionsReady listener;
 
     public QuestionBank(Context context) {
         this.questionOpenHelper = new QuestionOpenHelper(context);
         loadQuestionsFromFiles();
     }
 
-    public QuestionBank(Context context, IQuestionReadyCallback callback) {
-        loadQuestionsFromInternet(context, callback);
+    public QuestionBank() { }
+
+    public List<Question> getQuestions(Difficulty difficulty) {
+        return questionsMap.get(difficulty);
     }
 
-    public void loadQuestionsFromInternet(Context context, IQuestionReadyCallback callback) {
+    public void loadQuestionsFromFiles() {
+        Log.d(LOG_TAG, "[QUESTION BANK] Loading question from files");
+        questionsMap.put(easy, questionOpenHelper.readQuestionsFromFile(EASY_QUESTIONS_FILENAME));
+        questionsMap.put(medium, questionOpenHelper.readQuestionsFromFile(MEDIUM_QUESTIONS_FILENAME));
+        questionsMap.put(hard, questionOpenHelper.readQuestionsFromFile(HARD_QUESTIONS_FILENAME));
+    }
+
+    public void loadQuestionsFromInternet() {
         Log.d(LOG_TAG, "[QUESTION BANK] Loading question from internet");
-        IQuestionAPICallback mCallback = new IQuestionAPICallback() {
-            @Override
-            public void notifySuccess(Difficulty difficulty, List<Question> questionList) {
-                questionList.forEach(question -> Log.d(LOG_TAG, question.toString()));
-                questionsMap.put(difficulty, questionList);
-                if (questionsMap.size() >= 3)
-                    callback.notifySuccess();
-            }
-
-            @Override
-            public void notifyError(VolleyError error) {
-                Log.d(LOG_TAG, "Volley JSON post" + "That didn't work!");
-            }
-        };
-
-        this.questionAPIHelper = new QuestionAPIHelper(context, mCallback);
         questionAPIHelper.fetchQuestions(easy, 10);
         questionAPIHelper.fetchQuestions(medium, 10);
         questionAPIHelper.fetchQuestions(hard, 10);
-
     }
 
+    public void loadQuestionsAsync(Context context, OnQuestionsReady listener) {
+        this.listener = listener;
+        CheckInternet checkInternet = new CheckInternet(context);
+        if (checkInternet.isNetworkConnected()) {
+            this.questionAPIHelper = new QuestionAPIHelper(context, this);
+            loadQuestionsFromInternet();
+        } else {
+            this.questionOpenHelper = new QuestionOpenHelper(context);
+            loadQuestionsFromFiles();
+            listener.onQuestionsReady(this);
+        }
+    }
 
     public List<Question> getQuizQuestions() {
         List<Question> questionList = new ArrayList<>();
@@ -91,27 +96,14 @@ public class QuestionBank {
         for (int i : randomArrayInt(questionsMap.get(easy).size(), easyNumber)) {
             questionList.add(questionsMap.get(easy).get(i));
         }
-
         for (int i : randomArrayInt(questionsMap.get(medium).size(), mediumNumber)) {
             questionList.add(questionsMap.get(medium).get(i));
         }
-
         for (int i : randomArrayInt(questionsMap.get(hard).size(), hardNumber)) {
             questionList.add(questionsMap.get(hard).get(i));
         }
 
         return questionList;
-    }
-
-    public List<Question> getQuestions(Difficulty difficulty) {
-        return questionsMap.get(difficulty);
-    }
-
-    public void loadQuestionsFromFiles() {
-        Log.d(LOG_TAG, "[QUESTION BANK] Loading question from files");
-        questionsMap.put(easy, questionOpenHelper.readQuestionsFromFile(EASY_QUESTIONS_FILENAME));
-        questionsMap.put(medium, questionOpenHelper.readQuestionsFromFile(MEDIUM_QUESTIONS_FILENAME));
-        questionsMap.put(hard, questionOpenHelper.readQuestionsFromFile(HARD_QUESTIONS_FILENAME));
     }
 
     public boolean addQuestions(Question question) {
@@ -172,5 +164,23 @@ public class QuestionBank {
 
         Integer[] arr = new Integer[list.size()];
         return list.toArray(arr);
+    }
+
+
+    /**
+     * Overridden methods
+     */
+
+    @Override
+    public void onSuccess(Difficulty difficulty, List<Question> questionList) {
+//        questionList.forEach(question -> Log.d(LOG_TAG, question.toString()));
+        questionsMap.put(difficulty, questionList);
+        if (questionsMap.size() >= 3)
+            listener.onQuestionsReady(this);
+    }
+
+    @Override
+    public void onError(VolleyError error) {
+        Log.d(LOG_TAG, "Volley JSON post" + "That didn't work!");
     }
 }

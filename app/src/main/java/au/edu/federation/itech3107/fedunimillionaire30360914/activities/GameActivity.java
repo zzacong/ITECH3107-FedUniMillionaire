@@ -33,7 +33,7 @@ import java.util.TimerTask;
 import au.edu.federation.itech3107.fedunimillionaire30360914.R;
 import au.edu.federation.itech3107.fedunimillionaire30360914.controllers.QuizHandler;
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.CheckInternet;
-import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.IQuestionReadyCallback;
+import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.OnQuestionsReady;
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank;
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.ScoreDataSource;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
@@ -46,7 +46,7 @@ import static au.edu.federation.itech3107.fedunimillionaire30360914.activities.M
  * Datetime formatting to String | Referenced from https://www.javatpoint.com/java-simpledateformat
  * Get current datetime | Referenced from https://stackoverflow.com/questions/5369682/how-to-get-current-time-and-date-in-android
  */
-public class GameActivity extends AppCompatActivity {
+public class GameActivity extends AppCompatActivity implements OnQuestionsReady {
 
     public static final String EXTRA_RESULT = "au.edu.federation.itech3107.fedunimillionaire.extra.RESULT";
     public static final String EXTRA_MESSAGE = "au.edu.federation.itech3107.fedunimillionaire.extra.MESSAGE";
@@ -116,22 +116,11 @@ public class GameActivity extends AppCompatActivity {
             handler = new Handler();
         }
 
-        CheckInternet checkInternet = new CheckInternet(this);
-        if (checkInternet.isNetworkConnected()) {
-            IQuestionReadyCallback mCallback = () -> {
-                quizHandler.loadQuestions();
-                updateQuestionView(quizHandler.startFrom(1));
-            };
-            // Instantiate a new QuizHandler to manage the quiz questions
-            quizHandler = new QuizHandler(new QuestionBank(this, mCallback));
-
-        } else {
-            quizHandler = new QuizHandler((new QuestionBank(this)));
-            quizHandler.loadQuestions();
-            updateQuestionView(quizHandler.startFrom(1));
-        }
-
-
+        // Instantiate a new QuestionBank, and call loadQuestionsAsync(),
+        // pass in 'this' as context & listener
+        // to wait for QuestionBank to finish loading questions (from web API/files)
+        // then the onQuestionsReady() method will be called
+        new QuestionBank().loadQuestionsAsync(this, this);
     }
 
     // Called when users press submit button
@@ -222,31 +211,6 @@ public class GameActivity extends AppCompatActivity {
         finish();
     }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (quizHandler.getCurrentNumber() > 1) {
-            Log.d(LOG_TAG, "[SAVING STATE] Current question: " + quizHandler.getCurrentNumber());
-            outState.putInt(OUTSTATE_QUESTION_NO, quizHandler.getCurrentNumber());
-        }
-    }
-
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        int number = savedInstanceState.getInt(OUTSTATE_QUESTION_NO);
-        Log.d(LOG_TAG, "[RESTORING STATE] Current question: " + number);
-        updateQuestionView(quizHandler.startFrom(number));
-    }
-
-    @Override
-    protected void onStop() {
-        Log.d(LOG_TAG, "[ON_STOP]");
-        super.onStop();
-        if (isHotMode)
-            cancelHotCounting();
-    }
-
     public void insertScoreListing() {
         Date now = Calendar.getInstance().getTime();
         String formattedDate = dateTimeFormatter.format(now);
@@ -303,20 +267,6 @@ public class GameActivity extends AppCompatActivity {
         circularReveal.start();
     }
 
-    /**
-     * reference: https://stackoverflow.com/a/32105890
-     */
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        // Hide the lifelines modal when user touches outside the view
-        Rect viewRect = new Rect();
-        cvLifelines.getGlobalVisibleRect(viewRect);
-        if (!viewRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
-            cvLifelines.setVisibility(View.INVISIBLE);
-            fabHelp.setVisibility(View.VISIBLE);
-        }
-        return super.dispatchTouchEvent(ev);
-    }
 
     // Called when one of the lifeline buttons is pressed
     public void handleLifelines(View view) {
@@ -457,8 +407,58 @@ public class GameActivity extends AppCompatActivity {
     public void handleSwitchQuestion() {
         if (canUseLifeline[2]) {
             updateQuestionView(quizHandler.switchQuestion());
+            canUseLifeline[2] = false;
         }
-        canUseLifeline[2] = false;
+    }
+
+    /**
+     * Overridden methods
+     */
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (quizHandler.getCurrentNumber() > 1) {
+            Log.d(LOG_TAG, "[SAVING STATE] Current question: " + quizHandler.getCurrentNumber());
+            outState.putInt(OUTSTATE_QUESTION_NO, quizHandler.getCurrentNumber());
+        }
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        int number = savedInstanceState.getInt(OUTSTATE_QUESTION_NO);
+        Log.d(LOG_TAG, "[RESTORING STATE] Current question: " + number);
+        updateQuestionView(quizHandler.startFrom(number));
+    }
+
+    @Override
+    protected void onStop() {
+        Log.d(LOG_TAG, "[ON_STOP]");
+        super.onStop();
+        if (isHotMode)
+            cancelHotCounting();
+    }
+
+    @Override
+    public void onQuestionsReady(QuestionBank questionBank) {
+        quizHandler = new QuizHandler(questionBank);
+        updateQuestionView(quizHandler.startFrom(1));
+    }
+
+    /**
+     * reference: https://stackoverflow.com/a/32105890
+     */
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        // Hide the lifelines modal when user touches outside the view
+        Rect viewRect = new Rect();
+        cvLifelines.getGlobalVisibleRect(viewRect);
+        if (!viewRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
+            cvLifelines.setVisibility(View.INVISIBLE);
+            fabHelp.setVisibility(View.VISIBLE);
+        }
+        return super.dispatchTouchEvent(ev);
     }
 
 

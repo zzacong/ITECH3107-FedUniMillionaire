@@ -22,6 +22,7 @@ public class QuizHandler {
 
     public QuizHandler(QuestionBank questionBank) {
         this.questionBank = questionBank;
+        loadQuestions();
     }
 
     public void loadQuestions() {
