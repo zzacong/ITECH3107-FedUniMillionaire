@@ -124,7 +124,7 @@ public class GameActivity extends AppCompatActivity implements OnQuestionsReady 
     }
 
     // Called when users press submit button
-    public void handleSubmit(View view) {
+    public void onSubmit(View view) {
         int selectedRadId = radGroup.getCheckedRadioButtonId();
         // Check if player has selected an answer
         if (selectedRadId != -1) {
@@ -164,11 +164,10 @@ public class GameActivity extends AppCompatActivity implements OnQuestionsReady 
                 radButton.setText(question.getChoices().get(i));
             }
 
-            Integer currentNumber = quizHandler.getCurrentNumber();
             tvDollarValue.setText(quizHandler.getQuestionValue().toString());
             tvSafeMoney.setText(quizHandler.getSafeMoneyValue().toString());
             tvDifficulty.setText(question.getDifficulty().toString());
-            tvQuestionNumber.setText(currentNumber.toString());
+            tvQuestionNumber.setText(quizHandler.getCurrentNumber().toString());
             tvQuestionsLeft.setText(quizHandler.getQuestionsLeft().toString());
 
             // Reset hot seat timer
@@ -247,7 +246,7 @@ public class GameActivity extends AppCompatActivity implements OnQuestionsReady 
     };
 
     // Called when user press the lifelines button on the bottom right of screen
-    public void callLifeLines(View view) {
+    public void onCallLifeLines(View view) {
         view.setVisibility(View.INVISIBLE);
         circularRevealCard(cvLifelines);
     }
@@ -269,7 +268,7 @@ public class GameActivity extends AppCompatActivity implements OnQuestionsReady 
 
 
     // Called when one of the lifeline buttons is pressed
-    public void handleLifelines(View view) {
+    public void onLifeLines(View view) {
         view.setEnabled(false);
         switch (view.getId()) {
             case R.id.btnFiftyfifty:
@@ -308,17 +307,19 @@ public class GameActivity extends AppCompatActivity implements OnQuestionsReady 
                     }
                 }
                 if (++count >= 2) break;
+                canUseLifeline[0] = false;
             }
-            canUseLifeline[0] = false;
         }
     }
 
+    // Method to generate random integer within a range
     public int genRandIntInRange(int min, int max) {
         Log.d(LOG_TAG, "min: " + min + " , max: " + max);
         Random rand = new Random();
         return rand.nextInt(max - min) + min;
     }
 
+    // Method for calculating different percentage based on difficulty given
     public List<Integer> percentage(Difficulty difficulty) {
         List<Integer> list = new ArrayList<>();
         int sum = 0;
@@ -377,30 +378,32 @@ public class GameActivity extends AppCompatActivity implements OnQuestionsReady 
                 }
                 break;
         }
-
         return list;
     }
 
     public void handleAskAudience() {
-        // Show the percentages CardView
-        cvPercents.setVisibility(View.VISIBLE);
+        if (canUseLifeline[1]) {
+            // Show the percentages CardView
+            cvPercents.setVisibility(View.VISIBLE);
 
-        // Hide the lifelines buttons CardView
-        cvLifelines.setVisibility(View.INVISIBLE);
-        fabHelp.setVisibility(View.VISIBLE);
+            // Hide the lifelines buttons CardView
+            cvLifelines.setVisibility(View.INVISIBLE);
+            fabHelp.setVisibility(View.VISIBLE);
 
-        Question question = quizHandler.currentQuestion();
-        List<Integer> percentage = percentage(question.getDifficulty());
+            Question question = quizHandler.currentQuestion();
+            List<Integer> percentage = percentage(question.getDifficulty());
 
-        Log.d(LOG_TAG, "Percentage size: " + percentage.size());
-        for (int i = 0; i < tvPercentList.size(); i++) {
-            if (i == question.getAnswer()) {
-                // The last element in integerList is the percentage for the correct answer
-                tvPercentList.get(i).setText(percentage.get(percentage.size() - 1).toString());
-            } else {
-                tvPercentList.get(i).setText(percentage.get(0).toString());
-                percentage.remove(0);
+            Log.d(LOG_TAG, "Percentage size: " + percentage.size());
+            for (int i = 0; i < tvPercentList.size(); i++) {
+                if (i == question.getAnswer()) {
+                    // The last element in integerList is the percentage for the correct answer
+                    tvPercentList.get(i).setText(percentage.get(percentage.size() - 1).toString());
+                } else {
+                    tvPercentList.get(i).setText(percentage.get(0).toString());
+                    percentage.remove(0);
+                }
             }
+            canUseLifeline[1] = false;
         }
     }
 
