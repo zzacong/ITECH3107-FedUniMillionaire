@@ -2,7 +2,9 @@ package au.edu.federation.itech3107.fedunimillionaire30360914.activities;
 
 import android.animation.Animator;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Rect;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -18,7 +20,15 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
@@ -54,6 +64,7 @@ public class GameActivity extends AppCompatActivity implements OnQuestionsReadyC
     public static final String DATETIME_FORMAT = "dd/MM/yyyy HH:mm";
 
     private static final String LOG_TAG = GameActivity.class.getSimpleName();
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
 
     private final long HOT_MODE_TIME = 15000L;
     private final long ONE_SECOND = 1000L;
@@ -71,9 +82,14 @@ public class GameActivity extends AppCompatActivity implements OnQuestionsReadyC
     private Handler handler;
     private Timer timer;
 
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private Location lastKnownLocation;
+    private final LatLng ballarat = new LatLng(-37.5622, 143.8503);
+
     private String playerName;
     private boolean isHotMode;
     private boolean canUseLifeline[] = {true, true, true};
+    private boolean locationPermissionGranted;
 
 
     @Override
@@ -120,33 +136,13 @@ public class GameActivity extends AppCompatActivity implements OnQuestionsReadyC
         // to wait for QuestionBank to finish loading questions (from web API/files)
         // then the onQuestionsReady() method will be called
         new QuestionBank().loadQuestionsAsync(this, this);
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        // Check location permission and get device location
+        getLocationPermission();
     }
 
-    // Called when users press submit button
-    public void onSubmit(View view) {
-        int selectedRadId = radGroup.getCheckedRadioButtonId();
-        // Check if player has selected an answer
-        if (selectedRadId != -1) {
-            // Cancel hot seat timer
-            if (isHotMode) {
-                cancelHotCounting();
-            }
-
-            int selectedIndex = radGroup.indexOfChild(findViewById(selectedRadId));
-
-            // Check player has selected the correct answer;
-            if (quizHandler.currentQuestion().attempt(selectedIndex)) {
-                Log.d(LOG_TAG, "[CORRECT]");
-                updateQuestionView(quizHandler.nextQuestion());
-            } else {
-                Log.d(LOG_TAG, "[WRONG] Current question: " + quizHandler.getCurrentNumber());
-                endGame(false);
-            }
-        } else {
-            Log.d(LOG_TAG, "[INVALID] No answer selected");
-            Toast.makeText(this, "Please select an answer.", Toast.LENGTH_SHORT).show();
-        }
-    }
+    //region ---------- Normal quiz methods ----------
 
     // Display current question dollar value, safe money amount and show the questions and choices
     private void updateQuestionView(Question question) {
@@ -185,6 +181,30 @@ public class GameActivity extends AppCompatActivity implements OnQuestionsReadyC
         }
     }
 
+    // Called when users press submit button
+    public void onSubmit(View view) {
+        int selectedRadId = radGroup.getCheckedRadioButtonId();
+        // Check if player has selected an answer
+        if (selectedRadId != -1) {
+            // Cancel hot seat timer
+            if (isHotMode) {
+                cancelHotCounting();
+            }
+            int selectedIndex = radGroup.indexOfChild(findViewById(selectedRadId));
+            // Check player has selected the correct answer;
+            if (quizHandler.currentQuestion().attempt(selectedIndex)) {
+                Log.d(LOG_TAG, "[CORRECT]");
+                updateQuestionView(quizHandler.nextQuestion());
+            } else {
+                Log.d(LOG_TAG, "[WRONG] Current question: " + quizHandler.getCurrentNumber());
+                endGame(false);
+            }
+        } else {
+            Log.d(LOG_TAG, "[INVALID] No answer selected");
+            Toast.makeText(this, "Please select an answer.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     // Open the EndgameActivity with a boolean as the win/lose result
     private void endGame(boolean result) {
         endGame(result, null);
@@ -209,16 +229,9 @@ public class GameActivity extends AppCompatActivity implements OnQuestionsReadyC
         finish();
     }
 
-    public void insertScoreListing() {
-        Date now = Calendar.getInstance().getTime();
-        String formattedDate = dateTimeFormatter.format(now);
+    //endregion
 
-        ScoreDataSource dataSource = new ScoreDataSource(this);
-        dataSource.open();
-        // Add player's score to database
-        dataSource.insert(playerName, quizHandler.getSafeMoneyValue(), formattedDate);
-        dataSource.close();
-    }
+    //region ---------- Hot Seat ----------
 
     public void startHotCounting() {
         timer = new Timer();
@@ -236,13 +249,36 @@ public class GameActivity extends AppCompatActivity implements OnQuestionsReadyC
         Log.d(LOG_TAG, "[HOT MODE] Cancelled");
     }
 
-    private Runnable hotTask = new Runnable() {
-        @Override
-        public void run() {
-            Log.d(LOG_TAG, "[HOT MODE] Time's Up");
-            endGame(false, "Time's Up!");
-        }
+    private Runnable hotTask = () -> {
+        Log.d(LOG_TAG, "[HOT MODE] Time's Up");
+        endGame(false, "Time's Up!");
     };
+
+    //endregion
+
+    //region ---------- Database ----------
+
+    public void insertScoreListing() {
+        Date now = Calendar.getInstance().getTime();
+        String formattedDate = dateTimeFormatter.format(now);
+
+        ScoreDataSource dataSource = new ScoreDataSource(this);
+        dataSource.open();
+        // Add player's score to database
+        if (lastKnownLocation == null) {
+            // If there is no last known location, use Ballarat as the default location
+            Log.d(LOG_TAG, "[LOCATION] Insert default Ballarat");
+            dataSource.insert(playerName, quizHandler.getSafeMoneyValue(), formattedDate, ballarat.latitude, ballarat.longitude);
+        } else {
+            Log.d(LOG_TAG, "[LOCATION] Insert location");
+            dataSource.insert(playerName, quizHandler.getSafeMoneyValue(), formattedDate, lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+        }
+        dataSource.close();
+    }
+
+    //endregion
+
+    //region ---------- Lifelines ----------
 
     // Called when user press the lifelines button on the bottom right of screen
     public void onCallLifeLines(View view) {
@@ -413,9 +449,19 @@ public class GameActivity extends AppCompatActivity implements OnQuestionsReadyC
         }
     }
 
-    /**
-     * Overridden methods
-     */
+    //endregion
+
+    //region ---------- Load questions ----------
+
+    @Override
+    public void onQuestionsReady(QuestionBank questionBank) {
+        quizHandler = new QuizHandler(questionBank);
+        updateQuestionView(quizHandler.startFrom(1));
+    }
+
+    //endregion
+
+    //region ---------- Overridden methods ----------
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
@@ -442,12 +488,6 @@ public class GameActivity extends AppCompatActivity implements OnQuestionsReadyC
             cancelHotCounting();
     }
 
-    @Override
-    public void onQuestionsReady(QuestionBank questionBank) {
-        quizHandler = new QuizHandler(questionBank);
-        updateQuestionView(quizHandler.startFrom(1));
-    }
-
     /**
      * reference: https://stackoverflow.com/a/32105890
      */
@@ -463,10 +503,73 @@ public class GameActivity extends AppCompatActivity implements OnQuestionsReadyC
         return super.dispatchTouchEvent(ev);
     }
 
+    //endregion
+
+    //region ---------- Location ----------
 
     /**
-     * Private classes
+     * Prompts the user for permission to use the device location.
      */
+    private void getLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            locationPermissionGranted = true;
+            getDeviceLocation();
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
+    }
+
+    /**
+     * Handles the result of the request for location permissions.
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        locationPermissionGranted = false;
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    locationPermissionGranted = true;
+                    getDeviceLocation();
+                }
+            }
+        }
+    }
+
+    private void getDeviceLocation() {
+        /*
+         * Get the best and most recent location of the device, which may be null in rare
+         * cases when a location is not available.
+         */
+        try {
+            if (locationPermissionGranted) {
+                Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
+                locationResult.addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        lastKnownLocation = task.getResult();
+                        Log.d(LOG_TAG, String.format("[LOCATION] Current location is (%f, %f)", lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()));
+                    } else {
+                        Log.d(LOG_TAG, "[LOCATION] Current location is null");
+                        Log.e(LOG_TAG, "[LOCATION] Exception: %s", task.getException());
+                    }
+                });
+            }
+        } catch (SecurityException e)  {
+            Log.e("Exception: %s", e.getMessage(), e);
+        }
+    }
+
+    //endregion
+
+    //region ---------- Private classes ----------
+
     private class DisplaySecondsTask extends TimerTask {
         int seconds;
 
@@ -486,5 +589,7 @@ public class GameActivity extends AppCompatActivity implements OnQuestionsReadyC
             });
         }
     }
+
+    //endregion
 
 }

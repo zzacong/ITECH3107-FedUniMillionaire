@@ -38,9 +38,9 @@ public class QuestionActivity extends AppCompatActivity {
     private Spinner spDifficulty;
     private Button btnNewQuestion, btnShowEasy, btnShowMedium, btnShowHard;
 
-    QuestionBank questionBank;
-    QuestionListAdapter questionListAdapter;
-    Difficulty difficulty = easy;
+    private QuestionBank questionBank;
+    private QuestionListAdapter questionListAdapter;
+    private Difficulty difficulty = easy;
 
     private boolean showForm = false;
 
