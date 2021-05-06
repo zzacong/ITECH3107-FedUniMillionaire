@@ -77,8 +77,7 @@ public class QuestionBank implements OnQuestionsFetchedCallback {
 
     public void loadQuestionsAsync(Context context, OnQuestionsReadyCallback listener) {
         this.listener = listener;
-        CheckInternet checkInternet = new CheckInternet(context);
-        if (checkInternet.isNetworkConnected()) {
+        if (new CheckNetwork(context).isNetworkConnected()) {
             this.questionAPIHelper = new QuestionAPIHelper(context, this);
             loadQuestionsFromInternet();
         } else {

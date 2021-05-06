@@ -2,13 +2,12 @@ package au.edu.federation.itech3107.fedunimillionaire30360914.helpers;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
-import android.net.Network;
 
-public class CheckInternet {
+public class CheckNetwork {
 
     private Context context;
 
-    public CheckInternet(Context context) {
+    public CheckNetwork(Context context) {
         this.context = context;
     }
 

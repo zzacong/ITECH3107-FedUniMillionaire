@@ -396,9 +396,9 @@ public class GameActivity extends AppCompatActivity implements OnQuestionsReadyC
             for (int i = 0; i < tvPercentList.size(); i++) {
                 if (i == question.getAnswer()) {
                     // The last element in integerList is the percentage for the correct answer
-                    tvPercentList.get(i).setText(percentage.get(percentage.size() - 1).toString());
+                    tvPercentList.get(i).setText(String.format("%s%%", percentage.get(percentage.size() - 1).toString()));
                 } else {
-                    tvPercentList.get(i).setText(percentage.get(0).toString());
+                    tvPercentList.get(i).setText(String.format("%s%%", percentage.get(0).toString()));
                     percentage.remove(0);
                 }
             }
