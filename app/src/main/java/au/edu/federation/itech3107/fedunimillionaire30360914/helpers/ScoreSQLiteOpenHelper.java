@@ -12,7 +12,7 @@ public class ScoreSQLiteOpenHelper extends SQLiteOpenHelper {
 
     // Declare database name and version number
     private static final String DATABASE_NAME = "score.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     // Define the "score" table
     public static final String TABLE_SCORE = "score";
@@ -20,6 +20,8 @@ public class ScoreSQLiteOpenHelper extends SQLiteOpenHelper {
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_MONEY = "money";
     public static final String COLUMN_DATETIME = "datetime";
+    public static final String COLUMN_LAT = "lat";
+    public static final String COLUMN_LNG = "lng";
 
     // SQL for table creation
     private static final String DATABASE_CREATE = "CREATE TABLE "
@@ -27,7 +29,9 @@ public class ScoreSQLiteOpenHelper extends SQLiteOpenHelper {
             + COLUMN_ID + " integer PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_NAME + " text NOT NULL, "
             + COLUMN_MONEY + " integer NOT NULL, "
-            + COLUMN_DATETIME + " text NOT NULL "
+            + COLUMN_DATETIME + " text NOT NULL, "
+            + COLUMN_LAT + " real NOT NULL, "
+            + COLUMN_LNG + " real NOT NULL "
             + ");";
 
 

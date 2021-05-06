@@ -65,8 +65,7 @@ public class ScoreListAdapter extends RecyclerView.Adapter<ScoreListAdapter.View
         Log.d(LOG_TAG, score.toString());
 
         holder.tvName.setText(score.getName());
-        String money = "$" + score.getMoney();
-        holder.tvMoney.setText(money);
+        holder.tvMoney.setText(score.getMoney());
         holder.tvDatetime.setText(score.getDatetime());
         holder.cbDelete.setChecked(score.isChecked());
 

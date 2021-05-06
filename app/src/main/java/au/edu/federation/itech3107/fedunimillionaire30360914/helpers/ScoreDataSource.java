@@ -31,7 +31,9 @@ public class ScoreDataSource {
             ScoreSQLiteOpenHelper.COLUMN_ID,
             ScoreSQLiteOpenHelper.COLUMN_NAME,
             ScoreSQLiteOpenHelper.COLUMN_MONEY,
-            ScoreSQLiteOpenHelper.COLUMN_DATETIME
+            ScoreSQLiteOpenHelper.COLUMN_DATETIME,
+            ScoreSQLiteOpenHelper.COLUMN_LAT,
+            ScoreSQLiteOpenHelper.COLUMN_LNG
     };
 
     public ScoreDataSource(Context context) {
@@ -59,15 +61,15 @@ public class ScoreDataSource {
         database.close();
     }
 
-
     // Method to insert a record into the database
-    public void insert(String name, int money, String datetime) {
+    public void insert(String name, int money, String datetime, double lat, double lng) {
         // Create a ContentValues object and populate the row
         ContentValues values = new ContentValues();
-
         values.put(ScoreSQLiteOpenHelper.COLUMN_NAME, name);
         values.put(ScoreSQLiteOpenHelper.COLUMN_MONEY, money);
         values.put(ScoreSQLiteOpenHelper.COLUMN_DATETIME, datetime);
+        values.put(ScoreSQLiteOpenHelper.COLUMN_LAT, lat);
+        values.put(ScoreSQLiteOpenHelper.COLUMN_LNG, lng);
 
         // insert it into the database
         long insertId = database.insert(ScoreSQLiteOpenHelper.TABLE_SCORE, null, values);
@@ -96,18 +98,16 @@ public class ScoreDataSource {
     private Score cursorToScore(Cursor cursor) {
         Score sc = new Score(
                 cursor.getString(1), // name field
-                Integer.parseInt(cursor.getString(2)), // money field
-                cursor.getString(3) // datetime field
+                cursor.getInt(2), // money field
+                cursor.getString(3), // datetime field
+                cursor.getDouble(4), // lat field
+                cursor.getDouble(5) // lng field
         );
 
         // Set the id of the score (which was retrieved in field 0 of the record)
         sc.setId(cursor.getLong(0));
 
         return sc;
-    }
-
-    public List<Score> retrieveAllScores() {
-        return retrieveAllScores(null, null);
     }
 
     // Method to return a list of score with OrderBy function

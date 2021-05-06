@@ -1,15 +1,28 @@
 package au.edu.federation.itech3107.fedunimillionaire30360914.activities;
 
+import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,18 +36,23 @@ import au.edu.federation.itech3107.fedunimillionaire30360914.models.Score;
 /**
  * Add icon at side of TextView | Referenced from https://stackoverflow.com/questions/25279715/android-how-to-add-icon-at-the-left-side-of-the-textview
  */
-public class ScoresActivity extends AppCompatActivity {
+public class ScoresActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private static final String LOG_TAG = ScoresActivity.class.getSimpleName();
+    private static final int DEFAULT_ZOOM = 8;
 
     private Drawable arrowUpward, arrowDownward;
     private TextView tvMoneyHeader, tvDatetimeHeader;
     private RecyclerView rvScores;
+    private ScrollView svMain;
+    private ImageView imgTransparent;
 
+    private List<Score> scoreList;
     private ScoreListAdapter scoreListAdapter;
 
     private boolean moneyOrder = true;
     private boolean datetimeOrder = true;
+    private GoogleMap map;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,13 +62,16 @@ public class ScoresActivity extends AppCompatActivity {
         tvMoneyHeader = findViewById(R.id.tvMoneyHeader);
         tvDatetimeHeader = findViewById(R.id.tvDatetimeHeader);
         rvScores = findViewById(R.id.rvScores);
+        svMain = findViewById(R.id.svMain);
+        imgTransparent = findViewById(R.id.imgTransparent);
 
         arrowUpward = getDrawable(R.drawable.arrow_upward);
         arrowDownward = getDrawable(R.drawable.arrow_downward);
         arrowUpward.setTint(getColor(R.color.white));
         arrowDownward.setTint(getColor(R.color.white));
 
-        scoreListAdapter = new ScoreListAdapter(getAllRecordsFromDatabase(ScoreSQLiteOpenHelper.COLUMN_DATETIME, ScoreDataSource.ASC));
+        scoreList = getAllRecordsFromDatabase(ScoreSQLiteOpenHelper.COLUMN_DATETIME, ScoreDataSource.ASC);
+        scoreListAdapter = new ScoreListAdapter(scoreList);
 
         rvScores.setLayoutManager(new LinearLayoutManager(this));
         rvScores.setAdapter(scoreListAdapter);
@@ -73,6 +94,13 @@ public class ScoresActivity extends AppCompatActivity {
             tvMoneyHeader.setCompoundDrawables(null, null, null, null);
             sorting((TextView) v, ScoreSQLiteOpenHelper.COLUMN_DATETIME, datetimeOrder);
         });
+
+        touchEventInMap();
+
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.google_map);
+        mapFragment.getMapAsync(this);
     }
 
     // Method used to sort a column
@@ -95,7 +123,7 @@ public class ScoresActivity extends AppCompatActivity {
         return scoreList;
     }
 
-    public void deleteScores(View view) {
+    public void onDeleteScores(View view) {
         List<Score> scoreList = scoreListAdapter.getDataSet();
         List<Score> scoresToDelete = new ArrayList<>();
 
@@ -125,4 +153,51 @@ public class ScoresActivity extends AppCompatActivity {
         dataSource.delete(score);
         dataSource.close();
     }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void touchEventInMap() {
+        /**
+         * reference: https://stackoverflow.com/a/17317176
+         */
+        imgTransparent.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                int action = event.getAction();
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Disallow ScrollView to intercept touch events.
+                        svMain.requestDisallowInterceptTouchEvent(true);
+                        // Disable touch on transparent view
+                        return false;
+                    case MotionEvent.ACTION_UP:
+                        // Allow ScrollView to intercept touch events.
+                        svMain.requestDisallowInterceptTouchEvent(false);
+                        return true;
+                    default:
+                        return true;
+                }
+            }
+        });
+    }
+
+    //region ---------- Map ----------
+
+    @Override
+    public void onMapReady(@NonNull GoogleMap googleMap) {
+        map = googleMap;
+        map.getUiSettings().setZoomControlsEnabled(true);
+
+        // Add a marker for every score
+        LatLng latLng = null;
+        for (Score sc : scoreList) {
+            Log.d(LOG_TAG, String.format("[MAP] Marker (%f, %f)", sc.getLat(), sc.getLng()));
+            latLng = new LatLng(sc.getLat(), sc.getLng());
+            map.addMarker(new MarkerOptions().position(latLng).title(sc.getName()).snippet(sc.getMoney()));
+        }
+        if (latLng != null)
+            // Move camera to the last marker
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM));
+    }
+
+    //endregion
 }

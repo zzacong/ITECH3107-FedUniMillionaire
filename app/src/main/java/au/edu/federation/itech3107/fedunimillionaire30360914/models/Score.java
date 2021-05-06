@@ -7,11 +7,15 @@ public class Score {
     private int money;
     private String datetime;
     private boolean isChecked = false;
+    private double lat;
+    private double lng;
 
-    public Score(String name, int money, String datetime) {
+    public Score(String name, int money, String datetime, double lat, double lng) {
         this.name = name;
         this.money = money;
         this.datetime = datetime;
+        this.lat = lat;
+        this.lng = lng;
     }
 
     public long getId() {
@@ -26,24 +30,20 @@ public class Score {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getMoney() {
-        return money;
-    }
-
-    public void setMoney(int money) {
-        this.money = money;
+    public String getMoney() {
+        return String.format("$%d", money);
     }
 
     public String getDatetime() {
         return datetime;
     }
 
-    public void setDatetime(String datetime) {
-        this.datetime = datetime;
+    public double getLat() {
+        return lat;
+    }
+
+    public double getLng() {
+        return lng;
     }
 
     public boolean isChecked() {
@@ -61,6 +61,9 @@ public class Score {
                 ", name='" + name + '\'' +
                 ", money=" + money +
                 ", datetime='" + datetime + '\'' +
+                ", isChecked=" + isChecked +
+                ", lat=" + lat +
+                ", lng=" + lng +
                 '}';
     }
 }
