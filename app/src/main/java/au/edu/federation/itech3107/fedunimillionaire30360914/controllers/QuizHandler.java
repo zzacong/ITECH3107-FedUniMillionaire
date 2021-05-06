@@ -15,14 +15,18 @@ public class QuizHandler {
 
     private static final String LOG_TAG = QuizHandler.class.getSimpleName();
     private final int MAX = 11;
-    private final List<Question> questionList;
+    private List<Question> quizQuestions;
     private QuestionBank questionBank;
     private Integer currentNumber = 0;
 
 
     public QuizHandler(QuestionBank questionBank) {
         this.questionBank = questionBank;
-        this.questionList = questionBank.getQuizQuestions();
+        loadQuestions();
+    }
+
+    public void loadQuestions() {
+        quizQuestions = questionBank.getQuizQuestions();
     }
 
     public Integer getCurrentNumber() {
@@ -47,8 +51,8 @@ public class QuizHandler {
     }
 
     private Question getQuestionAt(int index) {
-        if (index < questionList.size()) {
-            return questionList.get(index);
+        if (index < quizQuestions.size()) {
+            return quizQuestions.get(index);
         }
         return null;
     }
@@ -63,8 +67,8 @@ public class QuizHandler {
 
     public Question switchQuestion() {
         Log.d(LOG_TAG, "[QUIZ HANDLER] Current number: " + currentNumber);
-        Question currentQuestion = questionList.get(currentNumber);
-        Log.d(LOG_TAG, "[QUIZ HANDLER] Current question: " + currentQuestion.getTitle());
+        Question currentQuestion = quizQuestions.get(currentNumber);
+        Log.d(LOG_TAG, "[QUIZ HANDLER] Current question: " + currentQuestion.toString());
 
         Difficulty difficulty = currentQuestion.getDifficulty();
         List<Question> questionList = questionBank.getQuestions(difficulty);
@@ -73,9 +77,9 @@ public class QuizHandler {
             int randInt = rand.nextInt(questionList.size());
             Question newQuestion = questionList.get(randInt);
             if (!newQuestion.getTitle().equals(currentQuestion.getTitle())) {
-                Log.d(LOG_TAG, "[QUIZ HANDLER] New question: " + newQuestion.getTitle());
-                questionList.remove(currentNumber);
-                questionList.add(currentNumber, newQuestion);
+                Log.d(LOG_TAG, "[QUIZ HANDLER] New question: " + newQuestion.toString());
+                quizQuestions.remove((int) currentNumber);
+                quizQuestions.add(currentNumber, newQuestion);
                 return newQuestion;
             }
         }

@@ -32,6 +32,8 @@ import java.util.TimerTask;
 
 import au.edu.federation.itech3107.fedunimillionaire30360914.R;
 import au.edu.federation.itech3107.fedunimillionaire30360914.controllers.QuizHandler;
+import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.CheckInternet;
+import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.OnQuestionsReady;
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank;
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.ScoreDataSource;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
@@ -44,7 +46,7 @@ import static au.edu.federation.itech3107.fedunimillionaire30360914.activities.M
  * Datetime formatting to String | Referenced from https://www.javatpoint.com/java-simpledateformat
  * Get current datetime | Referenced from https://stackoverflow.com/questions/5369682/how-to-get-current-time-and-date-in-android
  */
-public class GameActivity extends AppCompatActivity {
+public class GameActivity extends AppCompatActivity implements OnQuestionsReady {
 
     public static final String EXTRA_RESULT = "au.edu.federation.itech3107.fedunimillionaire.extra.RESULT";
     public static final String EXTRA_MESSAGE = "au.edu.federation.itech3107.fedunimillionaire.extra.MESSAGE";
@@ -62,8 +64,7 @@ public class GameActivity extends AppCompatActivity {
     private CardView cvLifelines, cvPercents;
     private TextView tvDollarValue, tvSafeMoney, tvDifficulty, tvQuestionsLeft, tvQuestionNumber, tvQuestionTitle, tvTimer, tvPercentA, tvPercentB, tvPercentC, tvPercentD;
     private RadioGroup radGroup;
-    private RadioButton radA, radB, radC, radD;
-    private Button btnSubmit, btnFiftyfifty, btnAudience, btnSwitch;
+    private Button btnSubmit;
     private FloatingActionButton fabHelp;
     private List<TextView> tvPercentList = new ArrayList<>();
 
@@ -100,10 +101,6 @@ public class GameActivity extends AppCompatActivity {
         tvPercentList.add(findViewById(R.id.tvPercentD));
 
         radGroup = findViewById(R.id.radGroup);
-        radA = findViewById(R.id.radA);
-        radB = findViewById(R.id.radB);
-        radC = findViewById(R.id.radC);
-        radD = findViewById(R.id.radD);
 
         btnSubmit = findViewById(R.id.btnSubmit);
         fabHelp = findViewById(R.id.fabHelp);
@@ -119,13 +116,15 @@ public class GameActivity extends AppCompatActivity {
             handler = new Handler();
         }
 
-        // Instantiate a new QuizHandler to manage the quiz questions
-        quizHandler = new QuizHandler(new QuestionBank(this));
-        updateQuestionView(quizHandler.startFrom(1));
+        // Instantiate a new QuestionBank, and call loadQuestionsAsync(),
+        // pass in 'this' as context & listener
+        // to wait for QuestionBank to finish loading questions (from web API/files)
+        // then the onQuestionsReady() method will be called
+        new QuestionBank().loadQuestionsAsync(this, this);
     }
 
     // Called when users press submit button
-    public void handleSubmit(View view) {
+    public void onSubmit(View view) {
         int selectedRadId = radGroup.getCheckedRadioButtonId();
         // Check if player has selected an answer
         if (selectedRadId != -1) {
@@ -165,11 +164,10 @@ public class GameActivity extends AppCompatActivity {
                 radButton.setText(question.getChoices().get(i));
             }
 
-            Integer currentNumber = quizHandler.getCurrentNumber();
             tvDollarValue.setText(quizHandler.getQuestionValue().toString());
             tvSafeMoney.setText(quizHandler.getSafeMoneyValue().toString());
             tvDifficulty.setText(question.getDifficulty().toString());
-            tvQuestionNumber.setText(currentNumber.toString());
+            tvQuestionNumber.setText(quizHandler.getCurrentNumber().toString());
             tvQuestionsLeft.setText(quizHandler.getQuestionsLeft().toString());
 
             // Reset hot seat timer
@@ -178,6 +176,8 @@ public class GameActivity extends AppCompatActivity {
                 Integer sec = (int) HOT_MODE_TIME / 1000;
                 tvTimer.setText(sec.toString());
             }
+
+            btnSubmit.setEnabled(true);
         } else {
             // If there's no more questions, disable the submit button and ends the game
             Log.d(LOG_TAG, "[DONE] No more questions");
@@ -208,31 +208,6 @@ public class GameActivity extends AppCompatActivity {
 
         startActivity(intent);
         finish();
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (quizHandler.getCurrentNumber() > 1) {
-            Log.d(LOG_TAG, "[SAVING STATE] Current question: " + quizHandler.getCurrentNumber());
-            outState.putInt(OUTSTATE_QUESTION_NO, quizHandler.getCurrentNumber());
-        }
-    }
-
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        int number = savedInstanceState.getInt(OUTSTATE_QUESTION_NO);
-        Log.d(LOG_TAG, "[RESTORING STATE] Current question: " + number);
-        updateQuestionView(quizHandler.startFrom(number));
-    }
-
-    @Override
-    protected void onStop() {
-        Log.d(LOG_TAG, "[ON_STOP]");
-        super.onStop();
-        if (isHotMode)
-            cancelHotCounting();
     }
 
     public void insertScoreListing() {
@@ -271,7 +246,7 @@ public class GameActivity extends AppCompatActivity {
     };
 
     // Called when user press the lifelines button on the bottom right of screen
-    public void callLifeLines(View view) {
+    public void onCallLifeLines(View view) {
         view.setVisibility(View.INVISIBLE);
         circularRevealCard(cvLifelines);
     }
@@ -291,23 +266,9 @@ public class GameActivity extends AppCompatActivity {
         circularReveal.start();
     }
 
-    /**
-     * reference: https://stackoverflow.com/a/32105890
-     */
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        // Hide the lifelines modal when user touches outside the view
-        Rect viewRect = new Rect();
-        cvLifelines.getGlobalVisibleRect(viewRect);
-        if (!viewRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
-            cvLifelines.setVisibility(View.INVISIBLE);
-            fabHelp.setVisibility(View.VISIBLE);
-        }
-        return super.dispatchTouchEvent(ev);
-    }
 
     // Called when one of the lifeline buttons is pressed
-    public void handleLifelines(View view) {
+    public void onLifeLines(View view) {
         view.setEnabled(false);
         switch (view.getId()) {
             case R.id.btnFiftyfifty:
@@ -346,17 +307,19 @@ public class GameActivity extends AppCompatActivity {
                     }
                 }
                 if (++count >= 2) break;
+                canUseLifeline[0] = false;
             }
-            canUseLifeline[0] = false;
         }
     }
 
+    // Method to generate random integer within a range
     public int genRandIntInRange(int min, int max) {
         Log.d(LOG_TAG, "min: " + min + " , max: " + max);
         Random rand = new Random();
         return rand.nextInt(max - min) + min;
     }
 
+    // Method for calculating different percentage based on difficulty given
     public List<Integer> percentage(Difficulty difficulty) {
         List<Integer> list = new ArrayList<>();
         int sum = 0;
@@ -415,38 +378,90 @@ public class GameActivity extends AppCompatActivity {
                 }
                 break;
         }
-
         return list;
     }
 
     public void handleAskAudience() {
-        // Show the percentages CardView
-        cvPercents.setVisibility(View.VISIBLE);
+        if (canUseLifeline[1]) {
+            // Show the percentages CardView
+            cvPercents.setVisibility(View.VISIBLE);
 
-        // Hide the lifelines buttons CardView
-        cvLifelines.setVisibility(View.INVISIBLE);
-        fabHelp.setVisibility(View.VISIBLE);
+            // Hide the lifelines buttons CardView
+            cvLifelines.setVisibility(View.INVISIBLE);
+            fabHelp.setVisibility(View.VISIBLE);
 
-        Question question = quizHandler.currentQuestion();
-        List<Integer> percentage = percentage(question.getDifficulty());
+            Question question = quizHandler.currentQuestion();
+            List<Integer> percentage = percentage(question.getDifficulty());
 
-        Log.d(LOG_TAG, "Percentage size: " + percentage.size());
-        for (int i = 0; i < tvPercentList.size(); i++) {
-            if (i == question.getAnswer()) {
-                // The last element in integerList is the percentage for the correct answer
-                tvPercentList.get(i).setText(percentage.get(percentage.size() - 1).toString());
-            } else {
-                tvPercentList.get(i).setText(percentage.get(0).toString());
-                percentage.remove(0);
+            Log.d(LOG_TAG, "Percentage size: " + percentage.size());
+            for (int i = 0; i < tvPercentList.size(); i++) {
+                if (i == question.getAnswer()) {
+                    // The last element in integerList is the percentage for the correct answer
+                    tvPercentList.get(i).setText(percentage.get(percentage.size() - 1).toString());
+                } else {
+                    tvPercentList.get(i).setText(percentage.get(0).toString());
+                    percentage.remove(0);
+                }
             }
+            canUseLifeline[1] = false;
         }
     }
 
     public void handleSwitchQuestion() {
         if (canUseLifeline[2]) {
             updateQuestionView(quizHandler.switchQuestion());
+            canUseLifeline[2] = false;
         }
-        canUseLifeline[2] = false;
+    }
+
+    /**
+     * Overridden methods
+     */
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (quizHandler.getCurrentNumber() > 1) {
+            Log.d(LOG_TAG, "[SAVING STATE] Current question: " + quizHandler.getCurrentNumber());
+            outState.putInt(OUTSTATE_QUESTION_NO, quizHandler.getCurrentNumber());
+        }
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        int number = savedInstanceState.getInt(OUTSTATE_QUESTION_NO);
+        Log.d(LOG_TAG, "[RESTORING STATE] Current question: " + number);
+        updateQuestionView(quizHandler.startFrom(number));
+    }
+
+    @Override
+    protected void onStop() {
+        Log.d(LOG_TAG, "[ON_STOP]");
+        super.onStop();
+        if (isHotMode)
+            cancelHotCounting();
+    }
+
+    @Override
+    public void onQuestionsReady(QuestionBank questionBank) {
+        quizHandler = new QuizHandler(questionBank);
+        updateQuestionView(quizHandler.startFrom(1));
+    }
+
+    /**
+     * reference: https://stackoverflow.com/a/32105890
+     */
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        // Hide the lifelines modal when user touches outside the view
+        Rect viewRect = new Rect();
+        cvLifelines.getGlobalVisibleRect(viewRect);
+        if (!viewRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
+            cvLifelines.setVisibility(View.INVISIBLE);
+            fabHelp.setVisibility(View.VISIBLE);
+        }
+        return super.dispatchTouchEvent(ev);
     }
 
 
