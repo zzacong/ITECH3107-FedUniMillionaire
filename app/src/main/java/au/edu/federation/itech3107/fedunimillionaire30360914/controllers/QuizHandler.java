@@ -78,8 +78,8 @@ public class QuizHandler {
             Question newQuestion = questionList.get(randInt);
             if (!newQuestion.getTitle().equals(currentQuestion.getTitle())) {
                 Log.d(LOG_TAG, "[QUIZ HANDLER] New question: " + newQuestion.toString());
-                questionList.remove(currentNumber);
-                questionList.add(currentNumber, newQuestion);
+                quizQuestions.remove((int) currentNumber);
+                quizQuestions.add(currentNumber, newQuestion);
                 return newQuestion;
             }
         }
