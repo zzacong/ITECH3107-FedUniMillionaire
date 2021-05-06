@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.interfaces.OnQuestionsFetchedCallback;
+import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.interfaces.OnQuestionsReadyCallback;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Difficulty;
 
@@ -21,7 +23,7 @@ import static au.edu.federation.itech3107.fedunimillionaire30360914.models.Quest
 import static au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Difficulty.hard;
 import static au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Difficulty.medium;
 
-public class QuestionBank implements OnQuestionsFetched {
+public class QuestionBank implements OnQuestionsFetchedCallback {
 
     public static final Map<Integer, int[]> QUESTION_VALUE_SAFE_MONEY_LIST = new HashMap<Integer, int[]>() {
         {
@@ -46,7 +48,7 @@ public class QuestionBank implements OnQuestionsFetched {
     ;
     private QuestionOpenHelper questionOpenHelper;
     private QuestionAPIHelper questionAPIHelper;
-    private OnQuestionsReady listener;
+    private OnQuestionsReadyCallback listener;
 
     public QuestionBank(Context context) {
         this.questionOpenHelper = new QuestionOpenHelper(context);
@@ -73,7 +75,7 @@ public class QuestionBank implements OnQuestionsFetched {
         questionAPIHelper.fetchQuestions(hard, 10);
     }
 
-    public void loadQuestionsAsync(Context context, OnQuestionsReady listener) {
+    public void loadQuestionsAsync(Context context, OnQuestionsReadyCallback listener) {
         this.listener = listener;
         CheckInternet checkInternet = new CheckInternet(context);
         if (checkInternet.isNetworkConnected()) {

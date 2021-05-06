@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.interfaces.OnQuestionsFetchedCallback;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Difficulty;
 
@@ -27,10 +28,10 @@ public class QuestionAPIHelper {
     private static final String QUERY_PARAMS = "?category=9&type=multiple";
 
     private Context context;
-    private OnQuestionsFetched listener;
+    private OnQuestionsFetchedCallback listener;
     RequestQueue queue;
 
-    public QuestionAPIHelper(Context context, OnQuestionsFetched listener) {
+    public QuestionAPIHelper(Context context, OnQuestionsFetchedCallback listener) {
         this.context = context;
         this.listener = listener;
         this.queue = Volley.newRequestQueue(context);

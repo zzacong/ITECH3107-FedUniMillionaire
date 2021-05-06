@@ -32,8 +32,7 @@ import java.util.TimerTask;
 
 import au.edu.federation.itech3107.fedunimillionaire30360914.R;
 import au.edu.federation.itech3107.fedunimillionaire30360914.controllers.QuizHandler;
-import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.CheckInternet;
-import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.OnQuestionsReady;
+import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.interfaces.OnQuestionsReadyCallback;
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank;
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.ScoreDataSource;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
@@ -46,7 +45,7 @@ import static au.edu.federation.itech3107.fedunimillionaire30360914.activities.M
  * Datetime formatting to String | Referenced from https://www.javatpoint.com/java-simpledateformat
  * Get current datetime | Referenced from https://stackoverflow.com/questions/5369682/how-to-get-current-time-and-date-in-android
  */
-public class GameActivity extends AppCompatActivity implements OnQuestionsReady {
+public class GameActivity extends AppCompatActivity implements OnQuestionsReadyCallback {
 
     public static final String EXTRA_RESULT = "au.edu.federation.itech3107.fedunimillionaire.extra.RESULT";
     public static final String EXTRA_MESSAGE = "au.edu.federation.itech3107.fedunimillionaire.extra.MESSAGE";
