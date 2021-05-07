@@ -50,6 +50,10 @@
     <string name="switch_">Switch</string>
     <string name="placeholder_num">##</string>
     <string name="shake_to_clear_form">Shake to clear form</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    <string name="dialog_clear_form_title">Clear form</string>
+    <string name="dialog_clear_form_message">Are you sure you want to clear the form?</string>
 
     <string-array name="difficulty_array">
         <item>easy</item>

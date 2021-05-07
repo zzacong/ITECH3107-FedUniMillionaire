@@ -1,5 +1,6 @@
 package au.edu.federation.itech3107.fedunimillionaire30360914.activities;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -104,6 +105,8 @@ public class QuestionActivity extends AppCompatActivity implements ShakeDetector
         mBtnNewQuestion.setText(mShowForm ? R.string.hide : R.string.new_);
         mClNewQuestionForm.setVisibility(mShowForm ? View.VISIBLE : View.GONE);
         mClQuestionList.setVisibility(mShowForm ? View.GONE : View.VISIBLE);
+        if (mShowForm) registerSensor();
+        else unregisterSensor();
     }
 
     public void showQuestions(View view) {
@@ -148,13 +151,8 @@ public class QuestionActivity extends AppCompatActivity implements ShakeDetector
                 // New question successfully added to file, show a success message
                 Toast.makeText(this, "New question successfully added!", Toast.LENGTH_SHORT).show();
 
-                // Reset the form
-                mEtQuestionTitle.setText("");
-                mEtCorrectAnswer.setText("");
-                mEtWrongAnswer1.setText("");
-                mEtWrongAnswer2.setText("");
-                mEtWrongAnswer3.setText("");
-                mSpDifficulty.setSelection(0);
+                // Reset the form after submission
+                clearForm();
 
                 // Hide the form and show questions
                 triggerView();
@@ -183,6 +181,15 @@ public class QuestionActivity extends AppCompatActivity implements ShakeDetector
         }
         mTvQuestionFormError.setText("");
         return true;
+    }
+
+    public void clearForm() {
+        mEtQuestionTitle.setText("");
+        mEtCorrectAnswer.setText("");
+        mEtWrongAnswer1.setText("");
+        mEtWrongAnswer2.setText("");
+        mEtWrongAnswer3.setText("");
+        mSpDifficulty.setSelection(0);
     }
     //endregion
 
@@ -219,7 +226,33 @@ public class QuestionActivity extends AppCompatActivity implements ShakeDetector
     //region ---------- Sensors ----------
     @Override
     public void onShake() {
-        Toast.makeText(this, "Don't shake me, bro!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Shaky shaky!", Toast.LENGTH_SHORT).show();
+        if (mShowForm) confirmClearForm();
+    }
+
+    public void confirmClearForm() {
+        android.app.AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.dialog_clear_form_title)
+                .setMessage(R.string.dialog_clear_form_message)
+                .setPositiveButton(R.string.confirm, (dialog, id) -> {
+                    Toast.makeText(this, "Form cleared!", Toast.LENGTH_SHORT).show();
+                    clearForm();
+                })
+                .setNegativeButton(R.string.cancel, (dialog, id) -> {
+                })
+                .show();
+    }
+
+    public void registerSensor() {
+        if (mSensor != null && mShakeDetector != null) {
+            mSensorManager.registerListener(mShakeDetector, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+    }
+
+    public void unregisterSensor() {
+        if (mSensor != null && mShakeDetector != null) {
+            mSensorManager.unregisterListener(mShakeDetector);
+        }
     }
     //endregion
 
@@ -227,17 +260,13 @@ public class QuestionActivity extends AppCompatActivity implements ShakeDetector
     @Override
     protected void onResume() {
         super.onResume();
-        if (mSensor != null && mShakeDetector != null) {
-            mSensorManager.registerListener(mShakeDetector, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
-        }
+        if (mShowForm) registerSensor();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (mSensor != null && mShakeDetector != null) {
-            mSensorManager.unregisterListener(mShakeDetector);
-        }
+        unregisterSensor();
     }
     //endregion
 }
