@@ -95,14 +95,16 @@ public class ScoresActivity extends AppCompatActivity implements OnMapReadyCallb
             sorting((TextView) v, ScoreSQLiteOpenHelper.COLUMN_DATETIME, datetimeOrder);
         });
 
-        touchEventInMap();
-
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.google_map);
         mapFragment.getMapAsync(this);
+
+        // Don't scroll in ScrollView on touch events in map
+        touchEventInMap();
     }
 
+    //region ---------- Score table ----------
     // Method used to sort a column
     private void sorting(TextView textView, String column, boolean isAsc) {
         Drawable rightIcon = isAsc ? arrowUpward : arrowDownward;
@@ -153,6 +155,25 @@ public class ScoresActivity extends AppCompatActivity implements OnMapReadyCallb
         dataSource.delete(score);
         dataSource.close();
     }
+    //endregion
+
+    //region ---------- Map ----------
+    @Override
+    public void onMapReady(@NonNull GoogleMap googleMap) {
+        map = googleMap;
+        map.getUiSettings().setZoomControlsEnabled(true);
+
+        // Add a marker for every score
+        LatLng latLng = null;
+        for (Score sc : scoreList) {
+            Log.d(LOG_TAG, String.format("[MAP] Marker (%f, %f)", sc.getLat(), sc.getLng()));
+            latLng = new LatLng(sc.getLat(), sc.getLng());
+            map.addMarker(new MarkerOptions().position(latLng).title(sc.getName()).snippet(sc.getMoney()));
+        }
+        if (latLng != null)
+            // Move camera to the last marker
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM));
+    }
 
     @SuppressLint("ClickableViewAccessibility")
     private void touchEventInMap() {
@@ -179,25 +200,5 @@ public class ScoresActivity extends AppCompatActivity implements OnMapReadyCallb
             }
         });
     }
-
-    //region ---------- Map ----------
-
-    @Override
-    public void onMapReady(@NonNull GoogleMap googleMap) {
-        map = googleMap;
-        map.getUiSettings().setZoomControlsEnabled(true);
-
-        // Add a marker for every score
-        LatLng latLng = null;
-        for (Score sc : scoreList) {
-            Log.d(LOG_TAG, String.format("[MAP] Marker (%f, %f)", sc.getLat(), sc.getLng()));
-            latLng = new LatLng(sc.getLat(), sc.getLng());
-            map.addMarker(new MarkerOptions().position(latLng).title(sc.getName()).snippet(sc.getMoney()));
-        }
-        if (latLng != null)
-            // Move camera to the last marker
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM));
-    }
-
     //endregion
 }

@@ -502,10 +502,12 @@ public class GameActivity extends AppCompatActivity implements OnQuestionsReadyC
         }
         return super.dispatchTouchEvent(ev);
     }
-
     //endregion
 
     //region ---------- Location ----------
+    /**
+     * reference: https://developers.google.com/maps/documentation/android-sdk/current-place-tutorial
+     */
 
     /**
      * Prompts the user for permission to use the device location.
@@ -565,11 +567,9 @@ public class GameActivity extends AppCompatActivity implements OnQuestionsReadyC
             Log.e("Exception: %s", e.getMessage(), e);
         }
     }
-
     //endregion
 
     //region ---------- Private classes ----------
-
     private class DisplaySecondsTask extends TimerTask {
         int seconds;
 
@@ -589,7 +589,6 @@ public class GameActivity extends AppCompatActivity implements OnQuestionsReadyC
             });
         }
     }
-
     //endregion
 
 }
