@@ -80,8 +80,7 @@ public class QuestionListAdapter extends RecyclerView.Adapter<QuestionListAdapte
 
         int j = 0;
         for (int i = 0; i < question.getChoices().size(); i++) {
-            if (i == question.getAnswer())
-                continue;
+            if (i == question.getAnswer()) continue;
 
             holder.tvWrongAnswers.get(j).setText(question.getChoices().get(i));
             j++;

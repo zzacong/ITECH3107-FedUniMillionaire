@@ -142,8 +142,12 @@ public class ScoresActivity extends AppCompatActivity implements OnMapReadyCallb
             // There are scores to delete
             // Remove all selected scores
             scoreList.removeAll(scoresToDelete);
+            mScoreList = new ArrayList<>(scoreList);
             mScoreListAdapter.notifyDataSetChanged();
             Toast.makeText(this, "Scores successfully deleted!", Toast.LENGTH_SHORT).show();
+
+            // Update map markers after scores are removed
+            updateMapUI();
         } else {
             Toast.makeText(this, "No scores selected", Toast.LENGTH_SHORT).show();
         }
@@ -162,6 +166,14 @@ public class ScoresActivity extends AppCompatActivity implements OnMapReadyCallb
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
         mMap.getUiSettings().setZoomControlsEnabled(true);
+        updateMapUI();
+    }
+
+    public void updateMapUI() {
+        if (mMap == null) return;
+
+        // Clear all existing markers first
+        mMap.clear();
 
         // Add a marker for every score
         LatLng latLng = null;
@@ -170,9 +182,10 @@ public class ScoresActivity extends AppCompatActivity implements OnMapReadyCallb
             latLng = new LatLng(sc.getLat(), sc.getLng());
             mMap.addMarker(new MarkerOptions().position(latLng).title(sc.getName()).snippet(sc.getMoney()));
         }
-        if (latLng != null)
-            // Move camera to the last marker
+        if (latLng != null) {
+            // Move camera to focus the last marker
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM));
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")

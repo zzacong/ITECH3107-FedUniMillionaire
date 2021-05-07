@@ -182,8 +182,9 @@ public class QuestionBank implements QuestionAPIHelper.OnFetchedListener {
     @Override
     public void onSuccess(Difficulty difficulty, List<Question> questionList) {
         mQuestionsMap.put(difficulty, questionList);
-        if (mQuestionsMap.size() >= 3)
+        if (mQuestionsMap.size() >= 3) {
             mListener.onQuestionsReady(this);
+        }
     }
 
     @Override

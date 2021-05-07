@@ -183,9 +183,8 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
         // Check if player has selected an answer
         if (selectedRadId != -1) {
             // Cancel hot seat timer
-            if (mIsHotMode) {
-                cancelHotCounting();
-            }
+            if (mIsHotMode) cancelHotCounting();
+
             int selectedIndex = mRadGroup.indexOfChild(findViewById(selectedRadId));
             // Check player has selected the correct answer;
             if (mQuizHandler.currentQuestion().attempt(selectedIndex)) {
@@ -217,9 +216,8 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
         // Pass the amount of money 'win'
         intent.putExtra(EXTRA_DOLLAR, mQuizHandler.getSafeMoneyValue().toString());
 
-        if (message != null)
-            // Pass any optional message to replace the default endgame-message
-            intent.putExtra(EXTRA_MESSAGE, message);
+        // Pass any optional message to replace the default endgame-message
+        if (message != null) intent.putExtra(EXTRA_MESSAGE, message);
 
         startActivity(intent);
         finish();
@@ -469,8 +467,7 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
     protected void onStop() {
         Log.d(LOG_TAG, "[ON_STOP]");
         super.onStop();
-        if (mIsHotMode)
-            cancelHotCounting();
+        if (mIsHotMode) cancelHotCounting();
     }
 
     /**
@@ -548,7 +545,7 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
                     }
                 });
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage(), e);
         }
     }

@@ -112,6 +112,9 @@ public class QuestionActivity extends AppCompatActivity implements ShakeDetector
         mBtnNewQuestion.setText(mShowForm ? R.string.hide : R.string.new_);
         mClNewQuestionForm.setVisibility(mShowForm ? View.VISIBLE : View.GONE);
         mClQuestionList.setVisibility(mShowForm ? View.GONE : View.VISIBLE);
+
+        // Register sensor when the form is opened,
+        // unregister when form is closed
         if (mShowForm) registerSensor();
         else unregisterSensor();
     }
@@ -164,9 +167,8 @@ public class QuestionActivity extends AppCompatActivity implements ShakeDetector
                 // Hide the form and show questions
                 triggerView();
 
-                if (this.difficulty == difficulty)
-                    // Update the RecyclerView only if we are viewing the same question type (difficulty)
-                    mQuestionListAdapter.addItem(newQuestion);
+                // Update the RecyclerView only if we are viewing the same question type (difficulty)
+                if (this.difficulty == difficulty) mQuestionListAdapter.addItem(newQuestion);
             } else {
                 // Failed to add question to file, show a fail message
                 Toast.makeText(this, "Fail to add new question.", Toast.LENGTH_SHORT).show();
@@ -201,15 +203,14 @@ public class QuestionActivity extends AppCompatActivity implements ShakeDetector
     //endregion
 
     //region ---------- Delete questions ----------
-    public void deleteQuestions(View view) {
+    // Delete button is pressed
+    public void onDeleteQuestions(View view) {
         List<Question> questionList = mQuestionListAdapter.getDataSet();
         List<Question> questionToDelete = new ArrayList<>();
 
         // For every question, check if the checkbox is selected
         for (Question q : questionList) {
-            if (q.isChecked()) {
-                questionToDelete.add(q);
-            }
+            if (q.isChecked()) questionToDelete.add(q);
         }
         if (!questionToDelete.isEmpty()) {
             // There are questions to delete
