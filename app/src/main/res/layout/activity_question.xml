@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- How to use Spinner | Referenced from https://developer.android.com/guide/topics/ui/controls/spinner -->
+<?xml version="1.0" encoding="utf-8"?><!-- How to use Spinner | Referenced from https://developer.android.com/guide/topics/ui/controls/spinner -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -37,7 +36,8 @@
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnNewQuestion">
+        app:layout_constraintTop_toBottomOf="@+id/btnNewQuestion"
+        tools:visibility="gone">
 
         <LinearLayout
             android:id="@+id/lyButtons"
@@ -116,7 +116,8 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/clQuestionList">
+        app:layout_constraintTop_toBottomOf="@+id/clQuestionList"
+        tools:visibility="visible">
 
         <LinearLayout
             android:id="@+id/lyQuestionTitle"
@@ -269,6 +270,19 @@
             android:text="@string/add"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/lyDifficulty" />
+
+        <TextView
+            android:id="@+id/tvShakeMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/shake_to_clear_form"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="@color/gray_400"
+            android:textStyle="italic"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnAddQuestion" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
