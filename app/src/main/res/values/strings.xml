@@ -49,6 +49,7 @@
     <string name="ask_audience">Ask audience</string>
     <string name="switch_">Switch</string>
     <string name="placeholder_num">##</string>
+    <string name="shake_to_clear_form">Shake to clear form</string>
 
     <string-array name="difficulty_array">
         <item>easy</item>

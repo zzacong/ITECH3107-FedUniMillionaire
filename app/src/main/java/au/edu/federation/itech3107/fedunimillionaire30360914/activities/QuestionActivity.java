@@ -1,5 +1,8 @@
 package au.edu.federation.itech3107.fedunimillionaire30360914.activities;
 
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,6 +22,7 @@ import java.util.List;
 import au.edu.federation.itech3107.fedunimillionaire30360914.R;
 import au.edu.federation.itech3107.fedunimillionaire30360914.controllers.QuestionListAdapter;
 import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.QuestionBank;
+import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.ShakeDetector;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Difficulty;
 
@@ -27,84 +31,106 @@ import static au.edu.federation.itech3107.fedunimillionaire30360914.models.Quest
 import static au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Difficulty.medium;
 import static au.edu.federation.itech3107.fedunimillionaire30360914.utils.MyString.capitalise;
 
-public class QuestionActivity extends AppCompatActivity {
+/**
+ * reference: https://developer.android.com/guide/topics/sensors/sensors_overview#sensors-monitor
+ */
+public class QuestionActivity extends AppCompatActivity implements ShakeDetector.OnShakeListener {
 
     private static final String LOG_TAG = QuestionActivity.class.getSimpleName();
 
-    private View clNewQuestionForm, clQuestionList;
-    private RecyclerView rvQuestionList;
-    private TextView tvQuestionFormError;
-    private EditText etQuestionTitle, etCorrectAnswer, etWrongAnswer1, etWrongAnswer2, etWrongAnswer3;
-    private Spinner spDifficulty;
-    private Button btnNewQuestion, btnShowEasy, btnShowMedium, btnShowHard;
+    private View mClNewQuestionForm, mClQuestionList;
+    private TextView mTvQuestionFormError;
+    private EditText mEtQuestionTitle, mEtCorrectAnswer, mEtWrongAnswer1, mEtWrongAnswer2, mEtWrongAnswer3;
+    private Spinner mSpDifficulty;
+    private Button mBtnNewQuestion, mBtnShowEasy, mBtnShowMedium, mBtnShowHard;
 
-    private QuestionBank questionBank;
-    private QuestionListAdapter questionListAdapter;
+    private QuestionBank mQuestionBank;
+    private QuestionListAdapter mQuestionListAdapter;
     private Difficulty difficulty = easy;
 
-    private boolean showForm = false;
+    private SensorManager mSensorManager;
+    private Sensor mSensor;
+    private ShakeDetector mShakeDetector;
+
+    private boolean mShowForm = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question);
 
-        clNewQuestionForm = findViewById(R.id.clNewQuestionForm);
-        clQuestionList = findViewById(R.id.clQuestionList);
-        rvQuestionList = findViewById(R.id.rvQuestionList);
-        tvQuestionFormError = findViewById(R.id.tvQuestionFormError);
-        etQuestionTitle = findViewById(R.id.etQuestionTitle);
-        etCorrectAnswer = findViewById(R.id.etCorrectAnswer);
-        etWrongAnswer1 = findViewById(R.id.etWrongAnswer1);
-        etWrongAnswer2 = findViewById(R.id.etWrongAnswer2);
-        etWrongAnswer3 = findViewById(R.id.etWrongAnswer3);
-        btnNewQuestion = findViewById(R.id.btnNewQuestion);
-        btnShowEasy = findViewById(R.id.btnShowEasy);
-        btnShowMedium = findViewById(R.id.btnShowMedium);
-        btnShowHard = findViewById(R.id.btnShowHard);
-        spDifficulty = findViewById(R.id.spDifficulty);
+        RecyclerView rvQuestionList = findViewById(R.id.rvQuestionList);
+        mClNewQuestionForm = findViewById(R.id.clNewQuestionForm);
+        mClQuestionList = findViewById(R.id.clQuestionList);
+        mTvQuestionFormError = findViewById(R.id.tvQuestionFormError);
+        mEtQuestionTitle = findViewById(R.id.etQuestionTitle);
+        mEtCorrectAnswer = findViewById(R.id.etCorrectAnswer);
+        mEtWrongAnswer1 = findViewById(R.id.etWrongAnswer1);
+        mEtWrongAnswer2 = findViewById(R.id.etWrongAnswer2);
+        mEtWrongAnswer3 = findViewById(R.id.etWrongAnswer3);
+        mBtnNewQuestion = findViewById(R.id.btnNewQuestion);
+        mBtnShowEasy = findViewById(R.id.btnShowEasy);
+        mBtnShowMedium = findViewById(R.id.btnShowMedium);
+        mBtnShowHard = findViewById(R.id.btnShowHard);
+        mSpDifficulty = findViewById(R.id.spDifficulty);
 
-        questionBank = new QuestionBank(this);
-        questionListAdapter = new QuestionListAdapter(questionBank.getQuestions(easy));
+        mQuestionBank = new QuestionBank(this);
+        mQuestionListAdapter = new QuestionListAdapter(mQuestionBank.getQuestions(easy));
 
         rvQuestionList.setLayoutManager(new LinearLayoutManager(this));
-        rvQuestionList.setAdapter(questionListAdapter);
+        rvQuestionList.setAdapter(mQuestionListAdapter);
 
-        btnNewQuestion.setOnClickListener(v -> {
+        mBtnNewQuestion.setOnClickListener(v -> {
             triggerView();
         });
+
+        // Sensors Implementation
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        // Use the accelerometer.
+        if ((mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)) != null) {
+            Log.d(LOG_TAG, "[SENSOR] Sensor found!");
+            Toast.makeText(this, "Sensor found!", Toast.LENGTH_SHORT).show();
+            mShakeDetector = new ShakeDetector(this);
+        } else {
+            // Sorry, there are no accelerometers on your device.
+            Log.d(LOG_TAG, "[SENSOR] No sensor found!");
+            Toast.makeText(this, "No sensor found!", Toast.LENGTH_SHORT).show();
+        }
     }
 
+    //region ---------- Listing questions ----------
     public void triggerView() {
-        showForm = !showForm;
-        btnNewQuestion.setText(showForm ? R.string.hide : R.string.new_);
-        clNewQuestionForm.setVisibility(showForm ? View.VISIBLE : View.GONE);
-        clQuestionList.setVisibility(showForm ? View.GONE : View.VISIBLE);
+        mShowForm = !mShowForm;
+        mBtnNewQuestion.setText(mShowForm ? R.string.hide : R.string.new_);
+        mClNewQuestionForm.setVisibility(mShowForm ? View.VISIBLE : View.GONE);
+        mClQuestionList.setVisibility(mShowForm ? View.GONE : View.VISIBLE);
     }
 
     public void showQuestions(View view) {
-        btnShowEasy.setEnabled(true);
-        btnShowMedium.setEnabled(true);
-        btnShowHard.setEnabled(true);
+        mBtnShowEasy.setEnabled(true);
+        mBtnShowMedium.setEnabled(true);
+        mBtnShowHard.setEnabled(true);
 
         view.setEnabled(false);
         switch (view.getId()) {
             case R.id.btnShowEasy:
                 difficulty = Difficulty.easy;
-                questionListAdapter.refresh(questionBank.getQuestions(easy));
+                mQuestionListAdapter.refresh(mQuestionBank.getQuestions(easy));
                 break;
             case R.id.btnShowMedium:
                 difficulty = Difficulty.medium;
-                questionListAdapter.refresh(questionBank.getQuestions(medium));
+                mQuestionListAdapter.refresh(mQuestionBank.getQuestions(medium));
                 break;
             case R.id.btnShowHard:
                 difficulty = Difficulty.hard;
-                questionListAdapter.refresh(questionBank.getQuestions(hard));
+                mQuestionListAdapter.refresh(mQuestionBank.getQuestions(hard));
                 break;
         }
         Log.d(LOG_TAG, "[SHOW QUESTIONS] " + difficulty);
     }
+    //endregion
 
+    //region ---------- New question ----------
     public void addQuestion(View view) {
         if (validateForm()) {
             // Form passes validation, now extract values from form fields
@@ -112,30 +138,30 @@ public class QuestionActivity extends AppCompatActivity {
             Question newQuestion = new Question();
 
             // Determine the type (difficulty) of new question
-            Difficulty difficulty = Difficulty.valueOf(spDifficulty.getSelectedItem().toString());
-            newQuestion.setTitle(etQuestionTitle.getText().toString());
+            Difficulty difficulty = Difficulty.valueOf(mSpDifficulty.getSelectedItem().toString());
+            newQuestion.setTitle(mEtQuestionTitle.getText().toString());
             newQuestion.setDifficulty(difficulty);
             newQuestion.setAnswer(0);
-            newQuestion.setChoices(etCorrectAnswer.getText().toString(), etWrongAnswer1.getText().toString(), etWrongAnswer2.getText().toString(), etWrongAnswer3.getText().toString());
+            newQuestion.setChoices(mEtCorrectAnswer.getText().toString(), mEtWrongAnswer1.getText().toString(), mEtWrongAnswer2.getText().toString(), mEtWrongAnswer3.getText().toString());
 
-            if (questionBank.addQuestions(newQuestion)) {
+            if (mQuestionBank.addQuestions(newQuestion)) {
                 // New question successfully added to file, show a success message
                 Toast.makeText(this, "New question successfully added!", Toast.LENGTH_SHORT).show();
 
                 // Reset the form
-                etQuestionTitle.setText("");
-                etCorrectAnswer.setText("");
-                etWrongAnswer1.setText("");
-                etWrongAnswer2.setText("");
-                etWrongAnswer3.setText("");
-                spDifficulty.setSelection(0);
+                mEtQuestionTitle.setText("");
+                mEtCorrectAnswer.setText("");
+                mEtWrongAnswer1.setText("");
+                mEtWrongAnswer2.setText("");
+                mEtWrongAnswer3.setText("");
+                mSpDifficulty.setSelection(0);
 
                 // Hide the form and show questions
                 triggerView();
 
                 if (this.difficulty == difficulty)
                     // Update the RecyclerView only if we are viewing the same question type (difficulty)
-                    questionListAdapter.addItem(newQuestion);
+                    mQuestionListAdapter.addItem(newQuestion);
             } else {
                 // Failed to add question to file, show a fail message
                 Toast.makeText(this, "Fail to add new question.", Toast.LENGTH_SHORT).show();
@@ -144,7 +170,7 @@ public class QuestionActivity extends AppCompatActivity {
     }
 
     public boolean validateForm() {
-        return isValidTextField(etQuestionTitle) && isValidTextField(etCorrectAnswer) && isValidTextField(etWrongAnswer1) && isValidTextField(etWrongAnswer2) && isValidTextField(etWrongAnswer3);
+        return isValidTextField(mEtQuestionTitle) && isValidTextField(mEtCorrectAnswer) && isValidTextField(mEtWrongAnswer1) && isValidTextField(mEtWrongAnswer2) && isValidTextField(mEtWrongAnswer3);
     }
 
     public boolean isValidTextField(EditText editText) {
@@ -152,15 +178,17 @@ public class QuestionActivity extends AppCompatActivity {
         if (string == null || string.isEmpty()) {
             Log.d(LOG_TAG, "[INVALID] " + editText.getHint() + " is empty");
             String errorMessage = capitalise(String.valueOf(editText.getHint())) + " is empty";
-            tvQuestionFormError.setText(errorMessage);
+            mTvQuestionFormError.setText(errorMessage);
             return false;
         }
-        tvQuestionFormError.setText("");
+        mTvQuestionFormError.setText("");
         return true;
     }
+    //endregion
 
+    //region ---------- Delete questions ----------
     public void deleteQuestions(View view) {
-        List<Question> questionList = questionListAdapter.getDataSet();
+        List<Question> questionList = mQuestionListAdapter.getDataSet();
         List<Question> questionToDelete = new ArrayList<>();
 
         // For every question, check if the checkbox is selected
@@ -175,8 +203,8 @@ public class QuestionActivity extends AppCompatActivity {
             questionList.removeAll(questionToDelete);
 
             // Override the filtered question list back its file
-            if (questionBank.writeQuestions(questionList, difficulty)) {
-                questionListAdapter.notifyDataSetChanged();
+            if (mQuestionBank.writeQuestions(questionList, difficulty)) {
+                mQuestionListAdapter.notifyDataSetChanged();
                 Toast.makeText(this, "Questions successfully deleted!", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Questions delete failed.", Toast.LENGTH_SHORT).show();
@@ -186,4 +214,30 @@ public class QuestionActivity extends AppCompatActivity {
             Toast.makeText(this, "No questions selected.", Toast.LENGTH_SHORT).show();
         }
     }
+    //endregion
+
+    //region ---------- Sensors ----------
+    @Override
+    public void onShake() {
+        Toast.makeText(this, "Don't shake me, bro!", Toast.LENGTH_SHORT).show();
+    }
+    //endregion
+
+    //region ---------- Override ----------
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mSensor != null && mShakeDetector != null) {
+            mSensorManager.registerListener(mShakeDetector, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mSensor != null && mShakeDetector != null) {
+            mSensorManager.unregisterListener(mShakeDetector);
+        }
+    }
+    //endregion
 }
