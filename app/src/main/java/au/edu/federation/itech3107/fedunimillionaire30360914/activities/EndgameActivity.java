@@ -11,14 +11,15 @@ import au.edu.federation.itech3107.fedunimillionaire30360914.R;
 
 public class EndgameActivity extends AppCompatActivity {
 
-    private TextView tvWinLose, tvDollar;
+    private TextView mTvWinLose, mTvDollar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_endgame);
-        tvWinLose = findViewById(R.id.tvWinLose);
-        tvDollar = findViewById(R.id.tvDollar);
+        mTvWinLose = findViewById(R.id.tvWinLose);
+        mTvDollar = findViewById(R.id.tvDollar);
 
         Intent intent = getIntent();
         boolean win = intent.getBooleanExtra(GameActivity.EXTRA_RESULT, true);
@@ -27,12 +28,12 @@ public class EndgameActivity extends AppCompatActivity {
 
         if (message != null) {
             // If custom message is provided, then use it to display on EndGame screen
-            tvWinLose.setText(message);
+            mTvWinLose.setText(message);
         } else {
             // Else, show end game message based on quiz result (win or lose?)
-            tvWinLose.setText(win ? R.string.win_message : R.string.lose_message);
+            mTvWinLose.setText(win ? R.string.win_message : R.string.lose_message);
         }
-        tvDollar.setText("$ " + dollar);
+        mTvDollar.setText("$ " + dollar);
     }
 
     // Called when user press the MainMenu button, return to MainActivity

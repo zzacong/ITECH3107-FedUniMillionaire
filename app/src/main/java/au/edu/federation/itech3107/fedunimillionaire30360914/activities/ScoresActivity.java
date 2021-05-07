@@ -21,7 +21,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
@@ -41,59 +40,43 @@ public class ScoresActivity extends AppCompatActivity implements OnMapReadyCallb
     private static final String LOG_TAG = ScoresActivity.class.getSimpleName();
     private static final int DEFAULT_ZOOM = 8;
 
-    private Drawable arrowUpward, arrowDownward;
-    private TextView tvMoneyHeader, tvDatetimeHeader;
-    private RecyclerView rvScores;
-    private ScrollView svMain;
-    private ImageView imgTransparent;
+    private Drawable mArrowUpward, mArrowDownward;
+    private TextView mTvMoneyHeader, mTvDatetimeHeader;
+    private ScrollView mSvMain;
+    private ImageView mImgTransparent;
 
-    private List<Score> scoreList;
-    private ScoreListAdapter scoreListAdapter;
+    private List<Score> mScoreList;
+    private ScoreListAdapter mScoreListAdapter;
 
-    private boolean moneyOrder = true;
-    private boolean datetimeOrder = true;
-    private GoogleMap map;
+    private boolean mMoneyOrder = true;
+    private boolean mDatetimeOrder = true;
+    private GoogleMap mMap;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scores);
 
-        tvMoneyHeader = findViewById(R.id.tvMoneyHeader);
-        tvDatetimeHeader = findViewById(R.id.tvDatetimeHeader);
-        rvScores = findViewById(R.id.rvScores);
-        svMain = findViewById(R.id.svMain);
-        imgTransparent = findViewById(R.id.imgTransparent);
+        RecyclerView mRvScores = findViewById(R.id.rvScores);
+        mTvMoneyHeader = findViewById(R.id.tvMoneyHeader);
+        mTvDatetimeHeader = findViewById(R.id.tvDatetimeHeader);
+        mSvMain = findViewById(R.id.svMain);
+        mImgTransparent = findViewById(R.id.imgTransparent);
 
-        arrowUpward = getDrawable(R.drawable.arrow_upward);
-        arrowDownward = getDrawable(R.drawable.arrow_downward);
-        arrowUpward.setTint(getColor(R.color.white));
-        arrowDownward.setTint(getColor(R.color.white));
+        mArrowUpward = getDrawable(R.drawable.arrow_upward);
+        mArrowDownward = getDrawable(R.drawable.arrow_downward);
+        mArrowUpward.setTint(getColor(R.color.white));
+        mArrowDownward.setTint(getColor(R.color.white));
 
-        scoreList = getAllRecordsFromDatabase(ScoreSQLiteOpenHelper.COLUMN_DATETIME, ScoreDataSource.ASC);
-        scoreListAdapter = new ScoreListAdapter(scoreList);
+        mScoreList = getAllRecordsFromDatabase(ScoreSQLiteOpenHelper.COLUMN_DATETIME, ScoreDataSource.ASC);
+        mScoreListAdapter = new ScoreListAdapter(mScoreList);
 
-        rvScores.setLayoutManager(new LinearLayoutManager(this));
-        rvScores.setAdapter(scoreListAdapter);
+        mRvScores.setLayoutManager(new LinearLayoutManager(this));
+        mRvScores.setAdapter(mScoreListAdapter);
 
-        tvDatetimeHeader.setCompoundDrawablesWithIntrinsicBounds(null, null, arrowUpward, null);
-
-
-        // set onClickListener on the moneyHeader text view
-        // to sort the scores by dollar value
-        tvMoneyHeader.setOnClickListener(v -> {
-            moneyOrder = !moneyOrder;
-            tvDatetimeHeader.setCompoundDrawables(null, null, null, null);
-            sorting((TextView) v, ScoreSQLiteOpenHelper.COLUMN_MONEY, moneyOrder);
-        });
-
-        // set onClickListener on the datetimeHeader text view
-        // to sort the scores by date/time
-        tvDatetimeHeader.setOnClickListener(v -> {
-            datetimeOrder = !datetimeOrder;
-            tvMoneyHeader.setCompoundDrawables(null, null, null, null);
-            sorting((TextView) v, ScoreSQLiteOpenHelper.COLUMN_DATETIME, datetimeOrder);
-        });
+        // Set arrowUpward right icon
+        mTvDatetimeHeader.setCompoundDrawablesWithIntrinsicBounds(null, null, mArrowUpward, null);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -104,16 +87,33 @@ public class ScoresActivity extends AppCompatActivity implements OnMapReadyCallb
         touchEventInMap();
     }
 
+
     //region ---------- Score table ----------
+    // set onClickListener on the moneyHeader text view
+    // to sort the scores by dollar value
+    public void onSortMoney(View view) {
+        mMoneyOrder = !mMoneyOrder;
+        mTvDatetimeHeader.setCompoundDrawables(null, null, null, null);
+        sorting((TextView) view, ScoreSQLiteOpenHelper.COLUMN_MONEY, mMoneyOrder);
+    }
+
+    // set onClickListener on the datetimeHeader text view
+    // to sort the scores by date/time
+    public void onSortDatetime(View view) {
+        mDatetimeOrder = !mDatetimeOrder;
+        mTvMoneyHeader.setCompoundDrawables(null, null, null, null);
+        sorting((TextView) view, ScoreSQLiteOpenHelper.COLUMN_DATETIME, mDatetimeOrder);
+    }
+
     // Method used to sort a column
     private void sorting(TextView textView, String column, boolean isAsc) {
-        Drawable rightIcon = isAsc ? arrowUpward : arrowDownward;
+        Drawable rightIcon = isAsc ? mArrowUpward : mArrowDownward;
         String order = isAsc ? ScoreDataSource.ASC : ScoreDataSource.DESC;
 
         Log.d(LOG_TAG, "[SORT] " + column + " " + order);
 
         textView.setCompoundDrawablesWithIntrinsicBounds(null, null, rightIcon, null);
-        scoreListAdapter.refresh(getAllRecordsFromDatabase(column, order));
+        mScoreListAdapter.refresh(getAllRecordsFromDatabase(column, order));
     }
 
     public List<Score> getAllRecordsFromDatabase(String column, String order) {
@@ -125,8 +125,9 @@ public class ScoresActivity extends AppCompatActivity implements OnMapReadyCallb
         return scoreList;
     }
 
+    // Delete button is pressed
     public void onDeleteScores(View view) {
-        List<Score> scoreList = scoreListAdapter.getDataSet();
+        List<Score> scoreList = mScoreListAdapter.getDataSet();
         List<Score> scoresToDelete = new ArrayList<>();
 
         // For every score, check if it is checked for delete
@@ -141,12 +142,11 @@ public class ScoresActivity extends AppCompatActivity implements OnMapReadyCallb
             // There are scores to delete
             // Remove all selected scores
             scoreList.removeAll(scoresToDelete);
-            scoreListAdapter.notifyDataSetChanged();
+            mScoreListAdapter.notifyDataSetChanged();
             Toast.makeText(this, "Scores successfully deleted!", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "No scores selected", Toast.LENGTH_SHORT).show();
         }
-
     }
 
     public void deleteFromDatabase(Score score) {
@@ -160,19 +160,19 @@ public class ScoresActivity extends AppCompatActivity implements OnMapReadyCallb
     //region ---------- Map ----------
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-        map = googleMap;
-        map.getUiSettings().setZoomControlsEnabled(true);
+        mMap = googleMap;
+        mMap.getUiSettings().setZoomControlsEnabled(true);
 
         // Add a marker for every score
         LatLng latLng = null;
-        for (Score sc : scoreList) {
+        for (Score sc : mScoreList) {
             Log.d(LOG_TAG, String.format("[MAP] Marker (%f, %f)", sc.getLat(), sc.getLng()));
             latLng = new LatLng(sc.getLat(), sc.getLng());
-            map.addMarker(new MarkerOptions().position(latLng).title(sc.getName()).snippet(sc.getMoney()));
+            mMap.addMarker(new MarkerOptions().position(latLng).title(sc.getName()).snippet(sc.getMoney()));
         }
         if (latLng != null)
             // Move camera to the last marker
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM));
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -180,19 +180,19 @@ public class ScoresActivity extends AppCompatActivity implements OnMapReadyCallb
         /**
          * reference: https://stackoverflow.com/a/17317176
          */
-        imgTransparent.setOnTouchListener(new View.OnTouchListener() {
+        mImgTransparent.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 int action = event.getAction();
                 switch (action) {
                     case MotionEvent.ACTION_DOWN:
                         // Disallow ScrollView to intercept touch events.
-                        svMain.requestDisallowInterceptTouchEvent(true);
+                        mSvMain.requestDisallowInterceptTouchEvent(true);
                         // Disable touch on transparent view
                         return false;
                     case MotionEvent.ACTION_UP:
                         // Allow ScrollView to intercept touch events.
-                        svMain.requestDisallowInterceptTouchEvent(false);
+                        mSvMain.requestDisallowInterceptTouchEvent(false);
                         return true;
                     default:
                         return true;

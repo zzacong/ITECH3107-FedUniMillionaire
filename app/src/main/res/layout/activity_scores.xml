@@ -70,6 +70,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawablePadding="6dp"
+                    android:onClick="onSortMoney"
                     android:text="@string/money_won"
                     android:textAlignment="center"
                     android:textColor="@color/white" />
@@ -90,6 +91,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawablePadding="6dp"
+                    android:onClick="onSortDatetime"
                     android:text="@string/date_time"
                     android:textAlignment="center"
                     android:textColor="@color/white" />

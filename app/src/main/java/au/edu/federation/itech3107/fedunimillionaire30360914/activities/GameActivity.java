@@ -62,31 +62,30 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
 
     private static final String LOG_TAG = GameActivity.class.getSimpleName();
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private static final LatLng BALLARAT = new LatLng(-37.5622, 143.8503);
 
     private final long HOT_MODE_TIME = 15000L;
     private final long ONE_SECOND = 1000L;
     private final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat(DATETIME_FORMAT);
 
+    private CardView mCvLifelines, mCvPercents;
+    private TextView mTvDollarValue, mTvSafeMoney, mTvDifficulty, mTvQuestionsLeft, mTvQuestionNumber, mTvQuestionTitle, mTvTimer;
+    private RadioGroup mRadGroup;
+    private Button mBtnSubmit;
+    private FloatingActionButton mFabHelp;
+    private List<TextView> mTvPercentList = new ArrayList<>();
 
-    private CardView cvLifelines, cvPercents;
-    private TextView tvDollarValue, tvSafeMoney, tvDifficulty, tvQuestionsLeft, tvQuestionNumber, tvQuestionTitle, tvTimer, tvPercentA, tvPercentB, tvPercentC, tvPercentD;
-    private RadioGroup radGroup;
-    private Button btnSubmit;
-    private FloatingActionButton fabHelp;
-    private List<TextView> tvPercentList = new ArrayList<>();
+    private QuizHandler mQuizHandler;
+    private Handler mHandler;
+    private Timer mTimer;
 
-    private QuizHandler quizHandler;
-    private Handler handler;
-    private Timer timer;
+    private FusedLocationProviderClient mFusedLocationProviderClient;
+    private Location mLastKnownLocation;
 
-    private FusedLocationProviderClient fusedLocationProviderClient;
-    private Location lastKnownLocation;
-    private final LatLng ballarat = new LatLng(-37.5622, 143.8503);
-
-    private String playerName;
-    private boolean isHotMode;
-    private boolean canUseLifeline[] = {true, true, true};
-    private boolean locationPermissionGranted;
+    private String mPlayerName;
+    private boolean mIsHotMode;
+    private boolean mCanUseLifeline[] = {true, true, true};
+    private boolean mLocationPermissionGranted;
 
 
     @Override
@@ -96,36 +95,36 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
         Log.d(LOG_TAG, "[ON_CREATE]");
 
         // Link variables to screen components
-        cvLifelines = findViewById(R.id.cvLifelines);
-        cvPercents = findViewById(R.id.cvPercents);
+        mCvLifelines = findViewById(R.id.cvLifelines);
+        mCvPercents = findViewById(R.id.cvPercents);
 
-        tvDollarValue = findViewById(R.id.tvDollarValue);
-        tvSafeMoney = findViewById(R.id.tvSafeMoney);
-        tvDifficulty = findViewById(R.id.tvDfficulty);
-        tvQuestionsLeft = findViewById(R.id.tvQuestionsLeft);
-        tvQuestionNumber = findViewById(R.id.tvQuestionNumber);
-        tvQuestionTitle = findViewById(R.id.tvQuestionTitle);
-        tvTimer = findViewById(R.id.tvTimer);
+        mTvDollarValue = findViewById(R.id.tvDollarValue);
+        mTvSafeMoney = findViewById(R.id.tvSafeMoney);
+        mTvDifficulty = findViewById(R.id.tvDfficulty);
+        mTvQuestionsLeft = findViewById(R.id.tvQuestionsLeft);
+        mTvQuestionNumber = findViewById(R.id.tvQuestionNumber);
+        mTvQuestionTitle = findViewById(R.id.tvQuestionTitle);
+        mTvTimer = findViewById(R.id.tvTimer);
 
-        tvPercentList.add(findViewById(R.id.tvPercentA));
-        tvPercentList.add(findViewById(R.id.tvPercentB));
-        tvPercentList.add(findViewById(R.id.tvPercentC));
-        tvPercentList.add(findViewById(R.id.tvPercentD));
+        mTvPercentList.add(findViewById(R.id.tvPercentA));
+        mTvPercentList.add(findViewById(R.id.tvPercentB));
+        mTvPercentList.add(findViewById(R.id.tvPercentC));
+        mTvPercentList.add(findViewById(R.id.tvPercentD));
 
-        radGroup = findViewById(R.id.radGroup);
+        mRadGroup = findViewById(R.id.radGroup);
 
-        btnSubmit = findViewById(R.id.btnSubmit);
-        fabHelp = findViewById(R.id.fabHelp);
+        mBtnSubmit = findViewById(R.id.btnSubmit);
+        mFabHelp = findViewById(R.id.fabHelp);
 
         // Get intent extra passed from MainActivity
         Intent intent = getIntent();
-        isHotMode = intent.getBooleanExtra(EXTRA_HOT_MODE, false);
-        playerName = intent.getStringExtra(EXTRA_PLAYER_NAME);
+        mIsHotMode = intent.getBooleanExtra(EXTRA_HOT_MODE, false);
+        mPlayerName = intent.getStringExtra(EXTRA_PLAYER_NAME);
 
         // Determine whether to start Hot Seat Mode
-        if (isHotMode) {
+        if (mIsHotMode) {
             // Instantiate a handler to handle hot seat count down task
-            handler = new Handler();
+            mHandler = new Handler();
         }
 
         // Instantiate a new QuestionBank, and call loadQuestionsAsync(),
@@ -134,66 +133,66 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
         // then the onQuestionsReady() method will be called
         new QuestionBank().loadQuestionsAsync(this, this);
 
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         // Check location permission and get device location
         getLocationPermission();
     }
 
-    //region ---------- Normal quiz methods ----------
 
+    //region ---------- Normal quiz methods ----------
     // Display current question dollar value, safe money amount and show the questions and choices
     private void updateQuestionView(Question question) {
         // Hide the percentages CardView if it is visible
-        if (cvPercents.getVisibility() == View.VISIBLE) cvPercents.setVisibility(View.INVISIBLE);
+        if (mCvPercents.getVisibility() == View.VISIBLE) mCvPercents.setVisibility(View.INVISIBLE);
 
         if (question != null) {
-            radGroup.clearCheck();
-            tvQuestionTitle.setText(question.getTitle());
+            mRadGroup.clearCheck();
+            mTvQuestionTitle.setText(question.getTitle());
 
             for (int i = 0; i < 4; i++) {
-                RadioButton radButton = (RadioButton) radGroup.getChildAt(i);
+                RadioButton radButton = (RadioButton) mRadGroup.getChildAt(i);
                 radButton.setEnabled(true);
                 radButton.setText(question.getChoices().get(i));
             }
 
-            tvDollarValue.setText(quizHandler.getQuestionValue().toString());
-            tvSafeMoney.setText(quizHandler.getSafeMoneyValue().toString());
-            tvDifficulty.setText(question.getDifficulty().toString());
-            tvQuestionNumber.setText(quizHandler.getCurrentNumber().toString());
-            tvQuestionsLeft.setText(quizHandler.getQuestionsLeft().toString());
+            mTvDollarValue.setText(mQuizHandler.getQuestionValue().toString());
+            mTvSafeMoney.setText(mQuizHandler.getSafeMoneyValue().toString());
+            mTvDifficulty.setText(question.getDifficulty().toString());
+            mTvQuestionNumber.setText(mQuizHandler.getCurrentNumber().toString());
+            mTvQuestionsLeft.setText(mQuizHandler.getQuestionsLeft().toString());
 
             // Reset hot seat timer
-            if (isHotMode) {
+            if (mIsHotMode) {
                 startHotCounting();
                 Integer sec = (int) HOT_MODE_TIME / 1000;
-                tvTimer.setText(sec.toString());
+                mTvTimer.setText(sec.toString());
             }
 
-            btnSubmit.setEnabled(true);
+            mBtnSubmit.setEnabled(true);
         } else {
             // If there's no more questions, disable the submit button and ends the game
             Log.d(LOG_TAG, "[DONE] No more questions");
-            btnSubmit.setEnabled(false);
+            mBtnSubmit.setEnabled(false);
             endGame(true);
         }
     }
 
     // Called when users press submit button
     public void onSubmit(View view) {
-        int selectedRadId = radGroup.getCheckedRadioButtonId();
+        int selectedRadId = mRadGroup.getCheckedRadioButtonId();
         // Check if player has selected an answer
         if (selectedRadId != -1) {
             // Cancel hot seat timer
-            if (isHotMode) {
+            if (mIsHotMode) {
                 cancelHotCounting();
             }
-            int selectedIndex = radGroup.indexOfChild(findViewById(selectedRadId));
+            int selectedIndex = mRadGroup.indexOfChild(findViewById(selectedRadId));
             // Check player has selected the correct answer;
-            if (quizHandler.currentQuestion().attempt(selectedIndex)) {
+            if (mQuizHandler.currentQuestion().attempt(selectedIndex)) {
                 Log.d(LOG_TAG, "[CORRECT]");
-                updateQuestionView(quizHandler.nextQuestion());
+                updateQuestionView(mQuizHandler.nextQuestion());
             } else {
-                Log.d(LOG_TAG, "[WRONG] Current question: " + quizHandler.getCurrentNumber());
+                Log.d(LOG_TAG, "[WRONG] Current question: " + mQuizHandler.getCurrentNumber());
                 endGame(false);
             }
         } else {
@@ -216,7 +215,7 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
         // Pass the result (win/lose)
         intent.putExtra(EXTRA_RESULT, result);
         // Pass the amount of money 'win'
-        intent.putExtra(EXTRA_DOLLAR, quizHandler.getSafeMoneyValue().toString());
+        intent.putExtra(EXTRA_DOLLAR, mQuizHandler.getSafeMoneyValue().toString());
 
         if (message != null)
             // Pass any optional message to replace the default endgame-message
@@ -225,24 +224,22 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
         startActivity(intent);
         finish();
     }
-
     //endregion
 
     //region ---------- Hot Seat ----------
-
     public void startHotCounting() {
-        timer = new Timer();
+        mTimer = new Timer();
         int initialSec = (int) HOT_MODE_TIME / 1000;
 
-        timer.scheduleAtFixedRate(new DisplaySecondsTask(initialSec), 0, ONE_SECOND);
+        mTimer.scheduleAtFixedRate(new DisplaySecondsTask(initialSec), 0, ONE_SECOND);
         // Post a job to handler to end the game after time's up
-        handler.postDelayed(hotTask, HOT_MODE_TIME);
+        mHandler.postDelayed(hotTask, HOT_MODE_TIME);
 
     }
 
     public void cancelHotCounting() {
-        timer.cancel();
-        handler.removeCallbacks(hotTask);
+        mTimer.cancel();
+        mHandler.removeCallbacks(hotTask);
         Log.d(LOG_TAG, "[HOT MODE] Cancelled");
     }
 
@@ -250,11 +247,9 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
         Log.d(LOG_TAG, "[HOT MODE] Time's Up");
         endGame(false, "Time's Up!");
     };
-
     //endregion
 
     //region ---------- Database ----------
-
     public void insertScoreListing() {
         Date now = Calendar.getInstance().getTime();
         String formattedDate = dateTimeFormatter.format(now);
@@ -262,25 +257,23 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
         ScoreDataSource dataSource = new ScoreDataSource(this);
         dataSource.open();
         // Add player's score to database
-        if (lastKnownLocation == null) {
+        if (mLastKnownLocation == null) {
             // If there is no last known location, use Ballarat as the default location
             Log.d(LOG_TAG, "[LOCATION] Insert default Ballarat");
-            dataSource.insert(playerName, quizHandler.getSafeMoneyValue(), formattedDate, ballarat.latitude, ballarat.longitude);
+            dataSource.insert(mPlayerName, mQuizHandler.getSafeMoneyValue(), formattedDate, BALLARAT.latitude, BALLARAT.longitude);
         } else {
             Log.d(LOG_TAG, "[LOCATION] Insert location");
-            dataSource.insert(playerName, quizHandler.getSafeMoneyValue(), formattedDate, lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+            dataSource.insert(mPlayerName, mQuizHandler.getSafeMoneyValue(), formattedDate, mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
         }
         dataSource.close();
     }
-
     //endregion
 
     //region ---------- Lifelines ----------
-
     // Called when user press the lifelines button on the bottom right of screen
     public void onCallLifeLines(View view) {
         view.setVisibility(View.INVISIBLE);
-        circularRevealCard(cvLifelines);
+        circularRevealCard(mCvLifelines);
     }
 
     /**
@@ -297,7 +290,6 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
         view.setVisibility(View.VISIBLE);
         circularReveal.start();
     }
-
 
     // Called when one of the lifeline buttons is pressed
     public void onLifeLines(View view) {
@@ -319,18 +311,18 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
     }
 
     public void handleFiftyfifty() {
-        if (canUseLifeline[0]) {
+        if (mCanUseLifeline[0]) {
             Random rand = new Random();
-            int answer = quizHandler.currentQuestion().getAnswer();
+            int answer = mQuizHandler.currentQuestion().getAnswer();
             Log.d(LOG_TAG, "[50:50] answer is " + answer);
             int count = 0;
-            for (int i = 0; i < radGroup.getChildCount(); i++) {
+            for (int i = 0; i < mRadGroup.getChildCount(); i++) {
                 while (true) {
                     int randInt = rand.nextInt(4);
                     // Make sure we don't eliminate the correct answer
                     if (randInt != answer) {
                         Log.d(LOG_TAG, "[50:50] Disable button: " + randInt);
-                        RadioButton radButton = (RadioButton) radGroup.getChildAt(randInt);
+                        RadioButton radButton = (RadioButton) mRadGroup.getChildAt(randInt);
                         // Make sure we don't repeat eliminating the same button
                         if (radButton.isEnabled()) {
                             radButton.setEnabled(false);
@@ -339,7 +331,7 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
                     }
                 }
                 if (++count >= 2) break;
-                canUseLifeline[0] = false;
+                mCanUseLifeline[0] = false;
             }
         }
     }
@@ -414,58 +406,54 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
     }
 
     public void handleAskAudience() {
-        if (canUseLifeline[1]) {
+        if (mCanUseLifeline[1]) {
             // Show the percentages CardView
-            cvPercents.setVisibility(View.VISIBLE);
+            mCvPercents.setVisibility(View.VISIBLE);
 
             // Hide the lifelines buttons CardView
-            cvLifelines.setVisibility(View.INVISIBLE);
-            fabHelp.setVisibility(View.VISIBLE);
+            mCvLifelines.setVisibility(View.INVISIBLE);
+            mFabHelp.setVisibility(View.VISIBLE);
 
-            Question question = quizHandler.currentQuestion();
+            Question question = mQuizHandler.currentQuestion();
             List<Integer> percentage = percentage(question.getDifficulty());
 
             Log.d(LOG_TAG, "Percentage size: " + percentage.size());
-            for (int i = 0; i < tvPercentList.size(); i++) {
+            for (int i = 0; i < mTvPercentList.size(); i++) {
                 if (i == question.getAnswer()) {
                     // The last element in integerList is the percentage for the correct answer
-                    tvPercentList.get(i).setText(String.format("%s%%", percentage.get(percentage.size() - 1).toString()));
+                    mTvPercentList.get(i).setText(String.format("%s%%", percentage.get(percentage.size() - 1).toString()));
                 } else {
-                    tvPercentList.get(i).setText(String.format("%s%%", percentage.get(0).toString()));
+                    mTvPercentList.get(i).setText(String.format("%s%%", percentage.get(0).toString()));
                     percentage.remove(0);
                 }
             }
-            canUseLifeline[1] = false;
+            mCanUseLifeline[1] = false;
         }
     }
 
     public void handleSwitchQuestion() {
-        if (canUseLifeline[2]) {
-            updateQuestionView(quizHandler.switchQuestion());
-            canUseLifeline[2] = false;
+        if (mCanUseLifeline[2]) {
+            updateQuestionView(mQuizHandler.switchQuestion());
+            mCanUseLifeline[2] = false;
         }
     }
-
     //endregion
 
     //region ---------- Load questions ----------
-
     @Override
     public void onQuestionsReady(QuestionBank questionBank) {
-        quizHandler = new QuizHandler(questionBank);
-        updateQuestionView(quizHandler.startFrom(1));
+        mQuizHandler = new QuizHandler(questionBank);
+        updateQuestionView(mQuizHandler.startFrom(1));
     }
-
     //endregion
 
     //region ---------- Overridden methods ----------
-
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (quizHandler.getCurrentNumber() > 1) {
-            Log.d(LOG_TAG, "[SAVING STATE] Current question: " + quizHandler.getCurrentNumber());
-            outState.putInt(OUTSTATE_QUESTION_NO, quizHandler.getCurrentNumber());
+        if (mQuizHandler.getCurrentNumber() > 1) {
+            Log.d(LOG_TAG, "[SAVING STATE] Current question: " + mQuizHandler.getCurrentNumber());
+            outState.putInt(OUTSTATE_QUESTION_NO, mQuizHandler.getCurrentNumber());
         }
     }
 
@@ -474,14 +462,14 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
         super.onRestoreInstanceState(savedInstanceState);
         int number = savedInstanceState.getInt(OUTSTATE_QUESTION_NO);
         Log.d(LOG_TAG, "[RESTORING STATE] Current question: " + number);
-        updateQuestionView(quizHandler.startFrom(number));
+        updateQuestionView(mQuizHandler.startFrom(number));
     }
 
     @Override
     protected void onStop() {
         Log.d(LOG_TAG, "[ON_STOP]");
         super.onStop();
-        if (isHotMode)
+        if (mIsHotMode)
             cancelHotCounting();
     }
 
@@ -492,10 +480,10 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
     public boolean dispatchTouchEvent(MotionEvent ev) {
         // Hide the lifelines modal when user touches outside the view
         Rect viewRect = new Rect();
-        cvLifelines.getGlobalVisibleRect(viewRect);
+        mCvLifelines.getGlobalVisibleRect(viewRect);
         if (!viewRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
-            cvLifelines.setVisibility(View.INVISIBLE);
-            fabHelp.setVisibility(View.VISIBLE);
+            mCvLifelines.setVisibility(View.INVISIBLE);
+            mFabHelp.setVisibility(View.VISIBLE);
         }
         return super.dispatchTouchEvent(ev);
     }
@@ -513,7 +501,7 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            locationPermissionGranted = true;
+            mLocationPermissionGranted = true;
             getDeviceLocation();
         } else {
             ActivityCompat.requestPermissions(this,
@@ -529,13 +517,13 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
-        locationPermissionGranted = false;
+        mLocationPermissionGranted = false;
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    locationPermissionGranted = true;
+                    mLocationPermissionGranted = true;
                     getDeviceLocation();
                 }
             }
@@ -548,12 +536,12 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
          * cases when a location is not available.
          */
         try {
-            if (locationPermissionGranted) {
-                Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
+            if (mLocationPermissionGranted) {
+                Task<Location> locationResult = mFusedLocationProviderClient.getLastLocation();
                 locationResult.addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        lastKnownLocation = task.getResult();
-                        Log.d(LOG_TAG, String.format("[LOCATION] Current location is (%f, %f)", lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()));
+                        mLastKnownLocation = task.getResult();
+                        Log.d(LOG_TAG, String.format("[LOCATION] Current location is (%f, %f)", mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
                     } else {
                         Log.d(LOG_TAG, "[LOCATION] Current location is null");
                         Log.e(LOG_TAG, "[LOCATION] Exception: %s", task.getException());
@@ -578,10 +566,10 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
         public void run() {
             Integer secToDisplay = seconds--;
             // Show the seconds left to answer
-            tvTimer.post(new Runnable() {
+            mTvTimer.post(new Runnable() {
                 @Override
                 public void run() {
-                    tvTimer.setText(secToDisplay.toString());
+                    mTvTimer.setText(secToDisplay.toString());
                 }
             });
         }

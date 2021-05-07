@@ -60,6 +60,7 @@ public class QuestionActivity extends AppCompatActivity implements ShakeDetector
 
     private boolean mShowForm = false;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,6 +104,7 @@ public class QuestionActivity extends AppCompatActivity implements ShakeDetector
             Toast.makeText(this, "No sensor found!", Toast.LENGTH_SHORT).show();
         }
     }
+
 
     //region ---------- Listing questions ----------
     public void triggerView() {

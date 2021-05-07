@@ -20,10 +20,10 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
-    private EditText etPlayerName;
-    private TextView tvErrorMessage;
+    private EditText mEtPlayerName;
+    private TextView mTvErrorMessage;
 
-    private String playerName;
+    private String mPlayerName;
 
 
     @Override
@@ -31,55 +31,56 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        etPlayerName = findViewById(R.id.etPlayerName);
-        tvErrorMessage = findViewById(R.id.tvErrorMessage);
+        mEtPlayerName = findViewById(R.id.etPlayerName);
+        mTvErrorMessage = findViewById(R.id.tvErrorMessage);
     }
+
 
     // Called when user press play button, open the GameActivity
     // in normal / hot seat mode
-    public void startGame(View view) {
+    public void onStartGame(View view) {
         // Start the game if player has entered a name
         if (validPlayerName()) {
             Log.d(LOG_TAG, "[START QUIZ]");
             Intent intent = new Intent(this, GameActivity.class);
-            intent.putExtra(EXTRA_PLAYER_NAME, playerName);
+            intent.putExtra(EXTRA_PLAYER_NAME, mPlayerName);
 
             // If player choose to start in hot seat mode
             if (view.getId() == R.id.btnStartHotMode) {
                 Log.d(LOG_TAG, "[START QUIZ] HOT SEAT MODE");
                 intent.putExtra(EXTRA_HOT_MODE, true);
             }
-
             // Start GameActivity
             startActivity(intent);
         }
     }
 
     // Called when user press view scores button, open the ScoreActivity
-    public void viewScores(View view) {
+    public void onViewScores(View view) {
         Log.d(LOG_TAG, "[VIEW SCORES]");
         Intent intent = new Intent(this, ScoresActivity.class);
         startActivity(intent);
     }
 
     // Called when user press edit question button, open the QuestionActivity
-    public void editQuestions(View view) {
+    public void onEditQuestions(View view) {
         Log.d(LOG_TAG, "[EDIT QUESTIONS]");
         Intent intent = new Intent(this, QuestionActivity.class);
         startActivity(intent);
     }
 
+    // Validation method
     public boolean validPlayerName() {
-        String name = etPlayerName.getText().toString();
+        String name = mEtPlayerName.getText().toString();
         boolean isValid = true;
 
         if (name == null || name.isEmpty()) {
             isValid = false;
             Log.d(LOG_TAG, "[INVALID] Player name is empty");
-            tvErrorMessage.setText(R.string.error_player_name);
+            mTvErrorMessage.setText(R.string.error_player_name);
         } else {
-            playerName = capitalise(name);
-            tvErrorMessage.setText("");
+            mPlayerName = capitalise(name);
+            mTvErrorMessage.setText("");
         }
         return isValid;
     }
