@@ -22,9 +22,11 @@ public class ShakeDetector implements SensorEventListener {
         void onShake();
     }
 
+
     public ShakeDetector(OnShakeListener onShakeListener) {
         this.mOnShakeListener = onShakeListener;
     }
+
 
     @Override
     public void onSensorChanged(SensorEvent event) {

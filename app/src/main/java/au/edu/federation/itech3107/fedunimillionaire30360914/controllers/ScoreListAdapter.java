@@ -22,7 +22,7 @@ public class ScoreListAdapter extends RecyclerView.Adapter<ScoreListAdapter.View
 
     public static final String LOG_TAG = ScoreListAdapter.class.getSimpleName();
 
-    private List<Score> localDataSet;
+    private List<Score> mLocalDataSet;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -38,17 +38,19 @@ public class ScoreListAdapter extends RecyclerView.Adapter<ScoreListAdapter.View
         }
     }
 
+
     public ScoreListAdapter(List<Score> localDataSet) {
-        this.localDataSet = localDataSet;
-        Log.d(LOG_TAG, this.localDataSet.size() + "");
+        this.mLocalDataSet = localDataSet;
+        Log.d(LOG_TAG, this.mLocalDataSet.size() + "");
     }
 
+
     public List<Score> getDataSet() {
-        return localDataSet;
+        return mLocalDataSet;
     }
 
     public void refresh(List<Score> dataSet) {
-        this.localDataSet = dataSet;
+        this.mLocalDataSet = dataSet;
         notifyDataSetChanged();
     }
 
@@ -61,7 +63,7 @@ public class ScoreListAdapter extends RecyclerView.Adapter<ScoreListAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull ScoreListAdapter.ViewHolder holder, int position) {
-        Score score = localDataSet.get(position);
+        Score score = mLocalDataSet.get(position);
         Log.d(LOG_TAG, score.toString());
 
         holder.tvName.setText(score.getName());
@@ -76,6 +78,6 @@ public class ScoreListAdapter extends RecyclerView.Adapter<ScoreListAdapter.View
 
     @Override
     public int getItemCount() {
-        return localDataSet.size();
+        return mLocalDataSet.size();
     }
 }

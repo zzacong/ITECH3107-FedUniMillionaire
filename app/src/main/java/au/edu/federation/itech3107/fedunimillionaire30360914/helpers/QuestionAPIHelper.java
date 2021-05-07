@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -16,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.interfaces.OnQuestionsFetchedCallback;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Difficulty;
 
@@ -24,18 +24,23 @@ public class QuestionAPIHelper {
 
     private static final String LOG_TAG = QuestionAPIHelper.class.getSimpleName();
     private static final String BASE_URL = "https://opentdb.com/api.php";
-    // category=General Knowledge, type=multiple
-    private static final String QUERY_PARAMS = "?category=9&type=multiple";
+    private static final String QUERY_PARAMS = "?category=9&type=multiple"; // category=General Knowledge, type=multiple
 
-    private Context context;
-    private OnQuestionsFetchedCallback listener;
-    RequestQueue queue;
+    private OnFetchedListener mListener;
+    private RequestQueue mQueue;
 
-    public QuestionAPIHelper(Context context, OnQuestionsFetchedCallback listener) {
-        this.context = context;
-        this.listener = listener;
-        this.queue = Volley.newRequestQueue(context);
+    public interface OnFetchedListener {
+        void onSuccess(Question.Difficulty difficulty, List<Question> questionList);
+
+        void onError(VolleyError error);
     }
+
+
+    public QuestionAPIHelper(Context context, OnFetchedListener listener) {
+        this.mListener = listener;
+        this.mQueue = Volley.newRequestQueue(context);
+    }
+
 
     public void fetchQuestions(Difficulty difficulty, int amount) {
         String url = buildUrl(difficulty, amount);
@@ -43,15 +48,15 @@ public class QuestionAPIHelper {
         // Request a string response from the provided URL
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 response -> {
-                    listener.onSuccess(difficulty, toQuestionList(response));
+                    mListener.onSuccess(difficulty, toQuestionList(response));
                 },
                 error -> {
                     Log.d(LOG_TAG, "[VOLLEY] Error: \n" + error);
-                    listener.onError(error);
+                    mListener.onError(error);
                 });
 
         // Add the request to the RequestQueue.
-        queue.add(jsonObjectRequest);
+        mQueue.add(jsonObjectRequest);
     }
 
 

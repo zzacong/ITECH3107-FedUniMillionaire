@@ -22,7 +22,7 @@ public class QuestionListAdapter extends RecyclerView.Adapter<QuestionListAdapte
 
     public static final String LOG_TAG = QuestionListAdapter.class.getSimpleName();
 
-    private List<Question> localDataSet;
+    private List<Question> mLocalDataSet;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -43,21 +43,23 @@ public class QuestionListAdapter extends RecyclerView.Adapter<QuestionListAdapte
         }
     }
 
+
     public QuestionListAdapter(List<Question> localDataSet) {
-        this.localDataSet = localDataSet;
+        this.mLocalDataSet = localDataSet;
     }
 
+
     public List<Question> getDataSet() {
-        return localDataSet;
+        return mLocalDataSet;
     }
 
     public void addItem(Question item) {
-        localDataSet.add(item);
-        notifyItemInserted(localDataSet.size() - 1);
+        mLocalDataSet.add(item);
+        notifyItemInserted(mLocalDataSet.size() - 1);
     }
 
     public void refresh(List<Question> dataSet) {
-        this.localDataSet = dataSet;
+        this.mLocalDataSet = dataSet;
         notifyDataSetChanged();
     }
 
@@ -70,7 +72,7 @@ public class QuestionListAdapter extends RecyclerView.Adapter<QuestionListAdapte
 
     @Override
     public void onBindViewHolder(@NonNull QuestionListAdapter.ViewHolder holder, int position) {
-        Question question = localDataSet.get(position);
+        Question question = mLocalDataSet.get(position);
 
         holder.tvQuestionTitle.setText(question.getTitle());
         holder.tvDifficulty.setText(question.getDifficulty().toString());
@@ -93,6 +95,6 @@ public class QuestionListAdapter extends RecyclerView.Adapter<QuestionListAdapte
 
     @Override
     public int getItemCount() {
-        return localDataSet.size();
+        return mLocalDataSet.size();
     }
 }

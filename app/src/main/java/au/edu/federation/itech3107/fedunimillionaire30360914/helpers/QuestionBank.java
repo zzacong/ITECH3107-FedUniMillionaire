@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.interfaces.OnQuestionsFetchedCallback;
-import au.edu.federation.itech3107.fedunimillionaire30360914.helpers.interfaces.OnQuestionsReadyCallback;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Difficulty;
 
@@ -23,7 +21,7 @@ import static au.edu.federation.itech3107.fedunimillionaire30360914.models.Quest
 import static au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Difficulty.hard;
 import static au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Difficulty.medium;
 
-public class QuestionBank implements OnQuestionsFetchedCallback {
+public class QuestionBank implements QuestionAPIHelper.OnFetchedListener {
 
     public static final Map<Integer, int[]> QUESTION_VALUE_SAFE_MONEY_LIST = new HashMap<Integer, int[]>() {
         {
@@ -44,44 +42,53 @@ public class QuestionBank implements OnQuestionsFetchedCallback {
 
     private static final String LOG_TAG = QuestionBank.class.getSimpleName();
 
-    private Map<Difficulty, List<Question>> questionsMap = new HashMap<>();
-    ;
-    private QuestionOpenHelper questionOpenHelper;
-    private QuestionAPIHelper questionAPIHelper;
-    private OnQuestionsReadyCallback listener;
+    private Map<Difficulty, List<Question>> mQuestionsMap = new HashMap<>();
+
+    private QuestionOpenHelper mQuestionOpenHelper;
+    private QuestionAPIHelper mQuestionAPIHelper;
+    private OnReadyListener mListener;
+
+    /**
+     * reference: https://stackoverflow.com/a/35629470
+     */
+    public interface OnReadyListener {
+        void onQuestionsReady(QuestionBank questionBank);
+    }
+
 
     public QuestionBank(Context context) {
-        this.questionOpenHelper = new QuestionOpenHelper(context);
+        this.mQuestionOpenHelper = new QuestionOpenHelper(context);
         loadQuestionsFromFiles();
     }
 
     public QuestionBank() { }
 
+
     public List<Question> getQuestions(Difficulty difficulty) {
-        return questionsMap.get(difficulty);
+        return mQuestionsMap.get(difficulty);
     }
 
     public void loadQuestionsFromFiles() {
         Log.d(LOG_TAG, "[QUESTION BANK] Loading question from files");
-        questionsMap.put(easy, questionOpenHelper.readQuestionsFromFile(EASY_QUESTIONS_FILENAME));
-        questionsMap.put(medium, questionOpenHelper.readQuestionsFromFile(MEDIUM_QUESTIONS_FILENAME));
-        questionsMap.put(hard, questionOpenHelper.readQuestionsFromFile(HARD_QUESTIONS_FILENAME));
+        mQuestionsMap.put(easy, mQuestionOpenHelper.readQuestionsFromFile(EASY_QUESTIONS_FILENAME));
+        mQuestionsMap.put(medium, mQuestionOpenHelper.readQuestionsFromFile(MEDIUM_QUESTIONS_FILENAME));
+        mQuestionsMap.put(hard, mQuestionOpenHelper.readQuestionsFromFile(HARD_QUESTIONS_FILENAME));
     }
 
     public void loadQuestionsFromInternet() {
         Log.d(LOG_TAG, "[QUESTION BANK] Loading question from internet");
-        questionAPIHelper.fetchQuestions(easy, 10);
-        questionAPIHelper.fetchQuestions(medium, 10);
-        questionAPIHelper.fetchQuestions(hard, 10);
+        mQuestionAPIHelper.fetchQuestions(easy, 10);
+        mQuestionAPIHelper.fetchQuestions(medium, 10);
+        mQuestionAPIHelper.fetchQuestions(hard, 10);
     }
 
-    public void loadQuestionsAsync(Context context, OnQuestionsReadyCallback listener) {
-        this.listener = listener;
+    public void loadQuestionsAsync(Context context, OnReadyListener listener) {
+        this.mListener = listener;
         if (new CheckNetwork(context).isNetworkConnected()) {
-            this.questionAPIHelper = new QuestionAPIHelper(context, this);
+            this.mQuestionAPIHelper = new QuestionAPIHelper(context, this);
             loadQuestionsFromInternet();
         } else {
-            this.questionOpenHelper = new QuestionOpenHelper(context);
+            this.mQuestionOpenHelper = new QuestionOpenHelper(context);
             loadQuestionsFromFiles();
             listener.onQuestionsReady(this);
         }
@@ -94,14 +101,14 @@ public class QuestionBank implements OnQuestionsFetchedCallback {
         final int mediumNumber = 4;
         final int hardNumber = 2;
 
-        for (int i : randomArrayInt(questionsMap.get(easy).size(), easyNumber)) {
-            questionList.add(questionsMap.get(easy).get(i));
+        for (int i : randomArrayInt(mQuestionsMap.get(easy).size(), easyNumber)) {
+            questionList.add(mQuestionsMap.get(easy).get(i));
         }
-        for (int i : randomArrayInt(questionsMap.get(medium).size(), mediumNumber)) {
-            questionList.add(questionsMap.get(medium).get(i));
+        for (int i : randomArrayInt(mQuestionsMap.get(medium).size(), mediumNumber)) {
+            questionList.add(mQuestionsMap.get(medium).get(i));
         }
-        for (int i : randomArrayInt(questionsMap.get(hard).size(), hardNumber)) {
-            questionList.add(questionsMap.get(hard).get(i));
+        for (int i : randomArrayInt(mQuestionsMap.get(hard).size(), hardNumber)) {
+            questionList.add(mQuestionsMap.get(hard).get(i));
         }
 
         return questionList;
@@ -121,7 +128,7 @@ public class QuestionBank implements OnQuestionsFetchedCallback {
                 break;
         }
 
-        if (questionOpenHelper.addQuestionToFile(fileName, question)) {
+        if (mQuestionOpenHelper.addQuestionToFile(fileName, question)) {
             // New question successfully added, now update memory of question list
             loadQuestionsFromFiles();
             return true;
@@ -143,7 +150,7 @@ public class QuestionBank implements OnQuestionsFetchedCallback {
                 break;
         }
 
-        if (questionOpenHelper.writeQuestionsToFile(fileName, questionsList)) {
+        if (mQuestionOpenHelper.writeQuestionsToFile(fileName, questionsList)) {
             // Questions overridden successfully, now update memory of question list
             loadQuestionsFromFiles();
             return true;
@@ -174,10 +181,9 @@ public class QuestionBank implements OnQuestionsFetchedCallback {
 
     @Override
     public void onSuccess(Difficulty difficulty, List<Question> questionList) {
-//        questionList.forEach(question -> Log.d(LOG_TAG, question.toString()));
-        questionsMap.put(difficulty, questionList);
-        if (questionsMap.size() >= 3)
-            listener.onQuestionsReady(this);
+        mQuestionsMap.put(difficulty, questionList);
+        if (mQuestionsMap.size() >= 3)
+            mListener.onQuestionsReady(this);
     }
 
     @Override

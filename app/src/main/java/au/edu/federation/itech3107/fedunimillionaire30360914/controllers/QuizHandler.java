@@ -14,72 +14,73 @@ import static au.edu.federation.itech3107.fedunimillionaire30360914.helpers.Ques
 public class QuizHandler {
 
     private static final String LOG_TAG = QuizHandler.class.getSimpleName();
-    private final int MAX = 11;
-    private List<Question> quizQuestions;
-    private QuestionBank questionBank;
-    private Integer currentNumber = 0;
+    private static final int MAX = 11;
+    private List<Question> mQuizQuestions;
+    private QuestionBank mQuestionBank;
+    private Integer mCurrentNumber = 0;
 
 
     public QuizHandler(QuestionBank questionBank) {
-        this.questionBank = questionBank;
+        this.mQuestionBank = questionBank;
         loadQuestions();
     }
 
+
     public void loadQuestions() {
-        quizQuestions = questionBank.getQuizQuestions();
+        mQuizQuestions = mQuestionBank.getQuizQuestions();
     }
 
     public Integer getCurrentNumber() {
-        return currentNumber + 1;
+        return mCurrentNumber + 1;
     }
 
     public Integer getQuestionsLeft() {
-        return MAX - (currentNumber + 1);
+        return MAX - (mCurrentNumber + 1);
     }
 
     public Question startFrom(int number) {
-        currentNumber = Math.max(number - 1, 0);
-        return getQuestionAt(currentNumber);
+        mCurrentNumber = Math.max(number - 1, 0);
+        return getQuestionAt(mCurrentNumber);
     }
 
     public Question nextQuestion() {
-        return getQuestionAt(++currentNumber);
+        return getQuestionAt(++mCurrentNumber);
     }
 
     public Question currentQuestion() {
-        return getQuestionAt(currentNumber);
+        return getQuestionAt(mCurrentNumber);
     }
 
     private Question getQuestionAt(int index) {
-        if (index < quizQuestions.size()) {
-            return quizQuestions.get(index);
+        if (index < mQuizQuestions.size()) {
+            return mQuizQuestions.get(index);
         }
         return null;
     }
 
     public Integer getSafeMoneyValue() {
-        return QUESTION_VALUE_SAFE_MONEY_LIST.get(currentNumber)[1];
+        return QUESTION_VALUE_SAFE_MONEY_LIST.get(mCurrentNumber)[1];
     }
 
     public Integer getQuestionValue() {
-        return QUESTION_VALUE_SAFE_MONEY_LIST.get(currentNumber)[0];
+        return QUESTION_VALUE_SAFE_MONEY_LIST.get(mCurrentNumber)[0];
     }
 
     public Question switchQuestion() {
-        Log.d(LOG_TAG, "[QUIZ HANDLER] Current number: " + currentNumber);
-        Question currentQuestion = quizQuestions.get(currentNumber);
+        Log.d(LOG_TAG, "[QUIZ HANDLER] Current number: " + mCurrentNumber);
+        Question currentQuestion = mQuizQuestions.get(mCurrentNumber);
         Log.d(LOG_TAG, "[QUIZ HANDLER] Current question: " + currentQuestion.toString());
 
         Difficulty difficulty = currentQuestion.getDifficulty();
-        List<Question> questionList = questionBank.getQuestions(difficulty);
+        List<Question> questionList = mQuestionBank.getQuestions(difficulty);
         Random rand = new Random();
         while (true) {
             int randInt = rand.nextInt(questionList.size());
             Question newQuestion = questionList.get(randInt);
             if (!newQuestion.getTitle().equals(currentQuestion.getTitle())) {
                 Log.d(LOG_TAG, "[QUIZ HANDLER] New question: " + newQuestion.toString());
-                quizQuestions.remove((int) currentNumber);
-                quizQuestions.add(currentNumber, newQuestion);
+                mQuizQuestions.remove((int) mCurrentNumber);
+                mQuizQuestions.add(mCurrentNumber, newQuestion);
                 return newQuestion;
             }
         }

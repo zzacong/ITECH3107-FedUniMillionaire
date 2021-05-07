@@ -5,17 +5,17 @@ import android.net.ConnectivityManager;
 
 public class CheckNetwork {
 
-    private Context context;
+    private Context mContext;
 
     public CheckNetwork(Context context) {
-        this.context = context;
+        this.mContext = context;
     }
 
     /**
      * reference: https://stackoverflow.com/a/9570292
      */
     public boolean isNetworkConnected() {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
     }
 

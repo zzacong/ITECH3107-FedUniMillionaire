@@ -32,10 +32,11 @@ public class QuestionOpenHelper {
 
     private static final String LOG_TAG = QuestionOpenHelper.class.getSimpleName();
 
-    private Context context;
+    private Context mContext;
+
 
     public QuestionOpenHelper(Context context) {
-        this.context = context;
+        this.mContext = context;
     }
 
 
@@ -108,12 +109,12 @@ public class QuestionOpenHelper {
         InputStream inputStream = null;
         try {
             // Try opening question file from internal storage
-            inputStream = context.openFileInput(fileName);
+            inputStream = mContext.openFileInput(fileName);
         } catch (FileNotFoundException e) {
             // If file is not found from internal storage,
             // then load it from assets folder
             Log.d(LOG_TAG, "[INTERNAL FILE NOT FOUND] Loading " + fileName + " from assets folder");
-            inputStream = context.getAssets().open(fileName);
+            inputStream = mContext.getAssets().open(fileName);
         }
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -137,7 +138,7 @@ public class QuestionOpenHelper {
         json.put("questions", questionArray);
 
         // Write JSON to file
-        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(context.openFileOutput(fileName, Context.MODE_PRIVATE)));
+        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(mContext.openFileOutput(fileName, Context.MODE_PRIVATE)));
         bufferedWriter.write(json.toString(2));
         bufferedWriter.close();
     }
