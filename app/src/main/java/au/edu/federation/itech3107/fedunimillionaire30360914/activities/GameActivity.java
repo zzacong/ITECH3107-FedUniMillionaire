@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -19,7 +20,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -68,11 +68,12 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
     private final long ONE_SECOND = 1000L;
     private final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat(DATETIME_FORMAT);
 
-    private CardView mCvLifelines, mCvPercents;
+    private View mClBody, mCvLifelines, mCvPercents;
     private TextView mTvDollarValue, mTvSafeMoney, mTvDifficulty, mTvQuestionsLeft, mTvQuestionNumber, mTvQuestionTitle, mTvTimer;
     private RadioGroup mRadGroup;
     private Button mBtnSubmit;
     private FloatingActionButton mFabHelp;
+    private ProgressBar mPbLoading;
     private List<TextView> mTvPercentList = new ArrayList<>();
 
     private QuizHandler mQuizHandler;
@@ -95,6 +96,7 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
         Log.d(LOG_TAG, "[ON_CREATE]");
 
         // Link variables to screen components
+        mClBody = findViewById(R.id.clBody);
         mCvLifelines = findViewById(R.id.cvLifelines);
         mCvPercents = findViewById(R.id.cvPercents);
 
@@ -116,6 +118,8 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
         mBtnSubmit = findViewById(R.id.btnSubmit);
         mFabHelp = findViewById(R.id.fabHelp);
 
+        mPbLoading = findViewById(R.id.pbLoading);
+
         // Get intent extra passed from MainActivity
         Intent intent = getIntent();
         mIsHotMode = intent.getBooleanExtra(EXTRA_HOT_MODE, false);
@@ -136,6 +140,8 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         // Check location permission and get device location
         getLocationPermission();
+        // Hide question until questions finished loading
+        mClBody.setVisibility(View.INVISIBLE);
     }
 
 
@@ -441,6 +447,9 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
     @Override
     public void onQuestionsReady(QuestionBank questionBank) {
         mQuizHandler = new QuizHandler(questionBank);
+        // Hide loading and show question
+        mPbLoading.setVisibility(View.GONE);
+        mClBody.setVisibility(View.VISIBLE);
         updateQuestionView(mQuizHandler.startFrom(1));
     }
     //endregion
