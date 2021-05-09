@@ -1,6 +1,7 @@
 package au.edu.federation.itech3107.fedunimillionaire30360914.helpers;
 
 import android.content.Context;
+import android.text.Html;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -19,6 +20,8 @@ import java.util.Random;
 
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question;
 import au.edu.federation.itech3107.fedunimillionaire30360914.models.Question.Difficulty;
+
+import static au.edu.federation.itech3107.fedunimillionaire30360914.utils.MyString.unescape;
 
 public class QuestionAPIHelper {
 
@@ -82,14 +85,14 @@ public class QuestionAPIHelper {
                 JSONArray incorrectAnswer = questionJson.getJSONArray("incorrect_answers");
                 List<String> choices = new ArrayList<>();
                 for (int j = 0; j < incorrectAnswer.length(); j++) {
-                    choices.add(incorrectAnswer.getString(j));
+                    choices.add(unescape(incorrectAnswer.getString(j)));
                 }
 
                 // Add the correct answer at a random position to the choices List
-                choices.add(answerIndex, questionJson.getString("correct_answer"));
+                choices.add(answerIndex, unescape(questionJson.getString("correct_answer")));
 
                 // Populate the question properties, then add it to the questions List
-                question.setTitle(questionJson.getString("question"));
+                question.setTitle(unescape(questionJson.getString("question")));
                 question.setChoices(choices);
                 question.setAnswer(answerIndex);
                 question.setDifficulty(Difficulty.valueOf(questionJson.getString("difficulty")));
