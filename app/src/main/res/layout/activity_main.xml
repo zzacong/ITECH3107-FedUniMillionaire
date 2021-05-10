@@ -89,7 +89,7 @@
         android:layout_marginStart="50dp"
         android:layout_marginEnd="50dp"
         android:onClick="onViewScores"
-        android:text="@string/view_scores"
+        android:text="@string/scores"
         app:layout_constraintBottom_toTopOf="@+id/btnEditQuestions"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -102,7 +102,7 @@
         android:layout_marginEnd="50dp"
         android:layout_marginBottom="32dp"
         android:onClick="onEditQuestions"
-        android:text="@string/edit_questions"
+        android:text="@string/questions"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
