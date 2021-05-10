@@ -135,7 +135,7 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
         // pass in 'this' as context & listener
         // to wait for QuestionBank to finish loading questions (from web API/files)
         // then the onQuestionsReady() method will be called
-        new QuestionBank().loadQuestionsAsync(this, this);
+        new QuestionBank(this).loadQuestionsAsync(this);
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         // Check location permission and get device location

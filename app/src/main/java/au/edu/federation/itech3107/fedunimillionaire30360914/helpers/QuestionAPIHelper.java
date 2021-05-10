@@ -1,7 +1,6 @@
 package au.edu.federation.itech3107.fedunimillionaire30360914.helpers;
 
 import android.content.Context;
-import android.text.Html;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -28,6 +27,7 @@ public class QuestionAPIHelper {
     private static final String LOG_TAG = QuestionAPIHelper.class.getSimpleName();
     private static final String BASE_URL = "https://opentdb.com/api.php";
     private static final String QUERY_PARAMS = "?category=9&type=multiple"; // category=General Knowledge, type=multiple
+    private static final String VOLLEY_REQUEST_TAG = "volley.request.tag";
 
     private OnFetchedListener mListener;
     private RequestQueue mQueue;
@@ -54,10 +54,11 @@ public class QuestionAPIHelper {
                     mListener.onSuccess(difficulty, toQuestionList(response));
                 },
                 error -> {
-                    Log.d(LOG_TAG, "[VOLLEY] Error: \n" + error);
+                    // Cancel all pending request
+                    mQueue.cancelAll(VOLLEY_REQUEST_TAG);
                     mListener.onError(error);
                 });
-
+        jsonObjectRequest.setTag(VOLLEY_REQUEST_TAG);
         // Add the request to the RequestQueue.
         mQueue.add(jsonObjectRequest);
     }

@@ -82,6 +82,7 @@ public class QuestionActivity extends AppCompatActivity implements ShakeDetector
         mSpDifficulty = findViewById(R.id.spDifficulty);
 
         mQuestionBank = new QuestionBank(this);
+        mQuestionBank.loadQuestionsFromFiles();
         mQuestionListAdapter = new QuestionListAdapter(mQuestionBank.getQuestions(easy));
 
         rvQuestionList.setLayoutManager(new LinearLayoutManager(this));

@@ -47,6 +47,7 @@ public class QuestionBank implements QuestionAPIHelper.OnFetchedListener {
     private QuestionOpenHelper mQuestionOpenHelper;
     private QuestionAPIHelper mQuestionAPIHelper;
     private OnReadyListener mListener;
+    private CheckNetwork checkNetwork;
 
     /**
      * reference: https://stackoverflow.com/a/35629470
@@ -58,10 +59,9 @@ public class QuestionBank implements QuestionAPIHelper.OnFetchedListener {
 
     public QuestionBank(Context context) {
         this.mQuestionOpenHelper = new QuestionOpenHelper(context);
-        loadQuestionsFromFiles();
+        this.mQuestionAPIHelper = new QuestionAPIHelper(context, this);
+        this.checkNetwork = new CheckNetwork(context);
     }
-
-    public QuestionBank() { }
 
 
     public List<Question> getQuestions(Difficulty difficulty) {
@@ -82,13 +82,11 @@ public class QuestionBank implements QuestionAPIHelper.OnFetchedListener {
         mQuestionAPIHelper.fetchQuestions(hard, 10);
     }
 
-    public void loadQuestionsAsync(Context context, OnReadyListener listener) {
+    public void loadQuestionsAsync(OnReadyListener listener) {
         this.mListener = listener;
-        if (new CheckNetwork(context).isNetworkConnected()) {
-            this.mQuestionAPIHelper = new QuestionAPIHelper(context, this);
+        if (checkNetwork.isNetworkConnected()) {
             loadQuestionsFromInternet();
         } else {
-            this.mQuestionOpenHelper = new QuestionOpenHelper(context);
             loadQuestionsFromFiles();
             listener.onQuestionsReady(this);
         }
@@ -189,6 +187,9 @@ public class QuestionBank implements QuestionAPIHelper.OnFetchedListener {
 
     @Override
     public void onError(VolleyError error) {
-        Log.d(LOG_TAG, "Volley JSON post" + "That didn't work!");
+        Log.e(LOG_TAG, "[VOLLEY] Error: \n" + error);
+        // Fallback to loading from internal files
+        loadQuestionsFromFiles();
+        mListener.onQuestionsReady(this);
     }
 }
