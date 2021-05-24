@@ -50,6 +50,7 @@ public class QuestionBank implements QuestionAPIHelper.OnFetchedListener {
     private CheckNetwork checkNetwork;
 
     /**
+     * Use interface to pass callback function
      * reference: https://stackoverflow.com/a/35629470
      */
     public interface OnReadyListener {

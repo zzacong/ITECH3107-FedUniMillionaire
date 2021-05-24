@@ -281,6 +281,7 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
     }
 
     /**
+     * Circular animation
      * reference: https://stackoverflow.com/a/42114635
      */
     // Animator function
@@ -480,6 +481,7 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
     }
 
     /**
+     * Detect touch event outside of view
      * reference: https://stackoverflow.com/a/32105890
      */
     @Override
@@ -497,6 +499,7 @@ public class GameActivity extends AppCompatActivity implements QuestionBank.OnRe
 
     //region ---------- Location ----------
     /**
+     * How to get location and use GoogleMap
      * reference: https://developers.google.com/maps/documentation/android-sdk/current-place-tutorial
      */
 

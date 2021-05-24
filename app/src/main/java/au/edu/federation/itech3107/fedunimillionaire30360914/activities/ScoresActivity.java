@@ -188,28 +188,26 @@ public class ScoresActivity extends AppCompatActivity implements OnMapReadyCallb
         }
     }
 
+    /**
+     * Ignore touch event in Map (interfer with ScrollView)
+     * reference: https://stackoverflow.com/a/17317176
+     */
     @SuppressLint("ClickableViewAccessibility")
     private void touchEventInMap() {
-        /**
-         * reference: https://stackoverflow.com/a/17317176
-         */
-        mImgTransparent.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                int action = event.getAction();
-                switch (action) {
-                    case MotionEvent.ACTION_DOWN:
-                        // Disallow ScrollView to intercept touch events.
-                        mSvMain.requestDisallowInterceptTouchEvent(true);
-                        // Disable touch on transparent view
-                        return false;
-                    case MotionEvent.ACTION_UP:
-                        // Allow ScrollView to intercept touch events.
-                        mSvMain.requestDisallowInterceptTouchEvent(false);
-                        return true;
-                    default:
-                        return true;
-                }
+        mImgTransparent.setOnTouchListener((v, event) -> {
+            int action = event.getAction();
+            switch (action) {
+                case MotionEvent.ACTION_DOWN:
+                    // Disallow ScrollView to intercept touch events.
+                    mSvMain.requestDisallowInterceptTouchEvent(true);
+                    // Disable touch on transparent view
+                    return false;
+                case MotionEvent.ACTION_UP:
+                    // Allow ScrollView to intercept touch events.
+                    mSvMain.requestDisallowInterceptTouchEvent(false);
+                    return true;
+                default:
+                    return true;
             }
         });
     }

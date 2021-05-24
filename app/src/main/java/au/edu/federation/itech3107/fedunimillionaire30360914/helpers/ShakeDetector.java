@@ -7,6 +7,7 @@ import android.hardware.SensorManager;
 import android.util.Log;
 
 /**
+ * How to detect shake event (calculation)
  * reference: https://stackoverflow.com/a/32803134
  */
 public class ShakeDetector implements SensorEventListener {

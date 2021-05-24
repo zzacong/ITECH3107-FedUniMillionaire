@@ -34,7 +34,7 @@ import static au.edu.federation.itech3107.fedunimillionaire30360914.utils.MyStri
 
 /**
  * reference: https://developer.android.com/guide/topics/sensors/sensors_overview#sensors-monitor
- * <p>
+ *
  * Sensor Implementation (Accelerometer sensor):
  * Shake the device while using the add new question form,
  * this will trigger a AlertDialog to confirm if you want to clear the form inputs

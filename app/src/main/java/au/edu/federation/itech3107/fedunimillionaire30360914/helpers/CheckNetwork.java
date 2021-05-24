@@ -12,6 +12,7 @@ public class CheckNetwork {
     }
 
     /**
+     * Check network connection
      * reference: https://stackoverflow.com/a/9570292
      */
     public boolean isNetworkConnected() {
